@@ -3,5 +3,5 @@ import 'package:eaw/dto/User.dart';
 
 class UserRepo{
   UserProvider userProvider = UserProvider();
- Future<List<User>> getInfor() => userProvider.getInfor();
+// Future<List<User>> getInfor() => userProvider.getInfor();
 }

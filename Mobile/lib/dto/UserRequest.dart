@@ -1,0 +1,7 @@
+
+
+class UserRequest{
+  String userId;
+
+
+}

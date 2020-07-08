@@ -1,7 +1,12 @@
+import 'package:eaw/blocs/InformationBloc.dart';
+import 'package:eaw/dto/InformationResponse.dart';
 import 'package:eaw/pages/EditPage.dart';
 import 'package:eaw/resource/CommonComponent.dart';
+import 'package:eaw/resource/SharedPreferences.dart';
+import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class InformationPage extends StatefulWidget {
@@ -20,23 +25,49 @@ class _InformationPageState extends State<InformationPage> {
     "Branch: ": icon2,
     "Store: ": icon2,
     "Position: ": icon2,
+    "Address: ": icon2,
     "BirthDay: ": icon,
     "Gmail: ": icon,
     "Phone: ": icon,
   };
+  Map<String, String> listOfContent;
   BuildContext context;
+  InformationResponse informationResponse;
 
   _InformationPageState(this.context);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: common.getAppbar("Information", context),
-        body: getBody(),
-        bottomNavigationBar: common.getNavigationBar(context, null));
+  loadInformation() async {
+    await informationBloc.getInformation(
+        await sharedRef.getStringValuesSF(ShareRef.tokenKey),
+        await sharedRef.getIntValuesSF(ShareRef.userId));
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: loadInformation(),
+        builder: (context, AsyncSnapshot snapshot) {
+          return StreamBuilder(
+              stream: informationBloc.getInformationResponse,
+              builder: (context, asyncSnapshot) {
+                informationResponse = asyncSnapshot.data;
+
+
+                  return Scaffold(
+                      resizeToAvoidBottomInset: false,
+                      appBar: common.getAppbar("Information", context),
+                      body:getBody(),
+                      bottomNavigationBar:
+                          common.getNavigationBar(context, null));
+
+              });
+        });
+  }
+
+loadDataBody(){
+  setMapData();
+ return getContent();
+}
   getBody() {
     return Container(
       width: common.getWidthContext(context),
@@ -52,7 +83,7 @@ class _InformationPageState extends State<InformationPage> {
           Container(
 //            color: Colors.blue,
             width: common.getWidthContext(context),
-            height: common.getHeightContext(context) / 3.5,
+            height: common.getHeightContext(context) / 3.3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
@@ -61,7 +92,7 @@ class _InformationPageState extends State<InformationPage> {
             ),
           ),
           Container(
-            child: getContent(),
+            child:   informationResponse != null ? loadDataBody() : loadingData()
           ),
         ],
       ),
@@ -81,13 +112,32 @@ class _InformationPageState extends State<InformationPage> {
       ),
     );
   }
-
+  loadingData(){
+   return Column(
+     mainAxisAlignment: MainAxisAlignment.center,
+     crossAxisAlignment: CrossAxisAlignment.center,
+     children: <Widget>[
+       SizedBox(height: common.getHeightContext(context)/11,),
+       Container(
+         child: SpinKitWanderingCubes(
+           itemBuilder: (BuildContext context, int index) {
+             return DecoratedBox(
+               decoration: BoxDecoration(
+                 color: index.isEven ? Colors.white : Colors.green,
+               ),
+             );
+           },
+         ),
+       ),
+     ],
+   );
+  }
   getRow() {
     return listOfTitle.entries
         .map((e) => Container(
-              margin: EdgeInsets.only(top: 8),
+              margin: EdgeInsets.only(top: 4),
               width: common.getWidthContext(context),
-              height: common.getHeightContext(context) / 16,
+              height: common.getHeightContext(context) / 17,
               child: Row(
                 children: <Widget>[
                   Expanded(
@@ -103,13 +153,12 @@ class _InformationPageState extends State<InformationPage> {
                     ),
                   ),
                   Expanded(
-                    // khi nào có data API thì viết function riêng r add data theo map
                     flex: 5,
                     child: Container(
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text(
-                          "Thanh Tân",
+                          getDataInMap(e.key), // map data
                           style: GoogleFonts.lato(
                               color: Colors.white,
 //                              fontWeight: FontWeight.bold,
@@ -125,7 +174,7 @@ class _InformationPageState extends State<InformationPage> {
                       )),
                     ),
                   ),
-                  getIcon(e.key, "Thanh Tân", e.value)
+                  getIcon(e.key,  getDataInMap(e.key), e.value)
 //          )
                 ],
               ),
@@ -133,9 +182,31 @@ class _InformationPageState extends State<InformationPage> {
         .toList();
   }
 
+  setMapData() {
+    listOfContent = Map<String, String>();
+    listOfContent.putIfAbsent("Branch:", () => informationResponse.brand);
+    listOfContent.putIfAbsent("Store:", () => "7-11 Fpt");
+    listOfContent.putIfAbsent("Position:", () => informationResponse.role);
+    listOfContent.putIfAbsent(
+        "BirthDay:", () => informationResponse.dayOfBirth);
+    listOfContent.putIfAbsent("Address:", () => informationResponse.address);
+    listOfContent.putIfAbsent("Gmail:", () => informationResponse.email);
+    listOfContent.putIfAbsent("Phone:", () => informationResponse.phone);
+  }
+
+  getDataInMap(String key) {
+    String data = "error";
+    if (listOfContent.containsKey(key.trim())) {
+      data = listOfContent[key.trim()];
+    }
+    return data;
+  }
+
   getIcon(String title, String oldValue, Icon e) {
     if (title.trim() != "Store:" &&
         title.trim() != "Branch:" &&
+        title.trim() != "Gmail:" &&
+        title.trim() != "Address:" &&
         title.trim() != "Position:") {
       return Expanded(
           flex: 1,

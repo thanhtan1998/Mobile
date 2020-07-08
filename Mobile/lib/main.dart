@@ -13,8 +13,8 @@ void main() {
 //  runApp(MaterialApp(home: FcmHandler(),));
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-//    initialRoute: Pages.getLoginPage,
-    initialRoute: Pages.getHomePage,
+    initialRoute: Pages.getLoginPage,
+//    initialRoute: Pages.getHomePage,
     routes:<String, WidgetBuilder> {
       Pages.getLoginPage: (BuildContext context) => LoginPage(context),
       Pages.getHomePage: (BuildContext context) => HomePage(context),

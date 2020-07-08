@@ -9,8 +9,8 @@ class UserBloc {
   Observable<List<User>> get listUser => fetch.stream;
 
   fetchUser() async {
-    List<User> listUser = await repo.getInfor();
-    fetch.sink.add(listUser);
+//    List<User> listUser = await repo.getInfor();
+//    fetch.sink.add(listUser);
   }
 
 }

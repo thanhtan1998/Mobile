@@ -1,4 +1,8 @@
+import 'package:eaw/blocs/HomeBloc.dart';
+import 'package:eaw/dto/HomeResponse.dart';
 import 'package:eaw/resource/CommonComponent.dart';
+import 'package:eaw/resource/SharedPreferences.dart';
+import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -16,13 +20,35 @@ class HomePageState extends State<HomePage> {
   BuildContext context;
   DateTime dateTime = DateTime.now();
   DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
+  Map<String, String> listContent;
+
   List<String> listTitle = [];
 
-  HomePageState(this.context);
+  HomePageState(this.context){
+    Map data = ModalRoute
+        .of(context)
+        .settings
+        .arguments;
+    if (data != null) {
+      homeResponse = data['data'];
+    } else {
+      getHomeResponse();
+    }
+    listContent = Map();
+    getListTitle();
+    getMapValue();
+  }
+
+  HomeResponse homeResponse;
+
+
+  getHomeResponse() async {
+    homeResponse =  homeBloc.getHomeResponse;
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    getListTitle();
     return Scaffold(
         appBar: common.getAppbar("Home", context),
         body: getBody(),
@@ -43,7 +69,7 @@ class HomePageState extends State<HomePage> {
         children: <Widget>[
           Container(
             width: common.getWidthContext(context),
-            height: common.getHeightContext(context) / 3.5,
+            height: common.getHeightContext(context) / 3.3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
@@ -53,7 +79,7 @@ class HomePageState extends State<HomePage> {
           ),
           Container(
             width: common.getWidthContext(context),
-            height: common.getHeightContext(context) / 13,
+            height: common.getHeightContext(context) / 14,
             color: Colors.black12,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -66,7 +92,7 @@ class HomePageState extends State<HomePage> {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.only(left:20),
+                    padding: const EdgeInsets.only(left: 20),
                     child: Text("${dateFormat.format(dateTime)}",
                         style: TextStyle(fontSize: 20, color: Colors.white)),
                   ),
@@ -85,8 +111,9 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget getContent() {
+    Iterable<MapEntry<String, String>> entry = listContent.entries;
     return ListView.builder(
-      itemCount: listTitle.length,
+      itemCount: entry.length,
       itemBuilder: (context, index) =>
           Container(
             width: common.getWidthContext(context),
@@ -106,27 +133,30 @@ class HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(20)),
                           child: Center(
                               child: Text(
-                                "${listTitle[index]}",
+                                "${entry
+                                    .elementAt(index)
+                                    .key}",
                                 style: TextStyle(
                                   fontSize: 16,
                                 ),
                                 textAlign: TextAlign.center,
                               )),
                         )),
-                    Expanded(flex: 6, child:
-                        Padding(
-                          padding: const EdgeInsets.only(left:20.0),
+                    Expanded(
+                        flex: 6,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0, top: 5),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Text("asdadas",style:TextStyle(color:Colors.grey)),
-                              Text("asdadas",style:TextStyle(color:Colors.black)),
-                              Text("asdadas",style:TextStyle(color:Colors.black)),
+                              Text("${entry
+                                  .elementAt(index)
+                                  .value}",
+                                  style: TextStyle(color: Colors.black)),
                             ],
                           ),
-                        )
-                    )
+                        ))
                   ],
                 ),
               ),
@@ -136,7 +166,16 @@ class HomePageState extends State<HomePage> {
     );
   }
 
+  getMapValue() {
+    double totalHours = homeResponse.totalHours;
+    String lastAttendance = homeResponse.lastAttendance ?? "Nothing to show";
+    String nextShift = homeResponse.lastAttendance ?? "Nothing to show";
+    listContent.putIfAbsent(listTitle[0], () => nextShift);
+    listContent.putIfAbsent(listTitle[1], () => "$totalHours");
+    listContent.putIfAbsent(listTitle[2], () => lastAttendance);
+  }
+
   getListTitle() {
-    listTitle = ["Next\nShift", "Total\nHours", "Last Attendance"];
+    listTitle = ["Next Shift", "Total Hours", "Last Attendance"];
   }
 }

@@ -1,4 +1,5 @@
 import 'package:eaw/blocs/GoogleBloc.dart';
+import 'package:eaw/dto/LoginRequest.dart';
 import 'package:eaw/pages/LoadingToHomePage.dart';
 import 'package:eaw/resource/CommonComponent.dart';
 import 'package:eaw/resource/urlEnum.dart';
@@ -19,13 +20,15 @@ class _LoginPageState extends State<LoginPage> {
 
   _LoginPageState(this.context);
 
+
   @override
-  void initState(){
-    page= common.firstTimeBuild();
-    if(page != null){
-      common.getNavigator(context, page, null);
-    }
+  void initState() {
+//    page= common.firstTimeBuild();
+//    if(page != null){
+//      common.getNavigator(context, page, null);
+//    }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: getBodyLogin());
@@ -64,16 +67,16 @@ class _LoginPageState extends State<LoginPage> {
         splashColor: Colors.grey,
         onPressed: () {
           googleBloc.signInGoogle();
-          googleBloc.getUser.listen((event) {
-              if (event != null)
-                common.getNavigator(context, Pages.getLoadingToHomePage, null);
-
+          googleBloc.getLoginRequest.listen((event) {
+            if (event != null)
+              common.getNavigator(context, Pages.getLoadingToHomePage, event);
           });
 //           Navigator.push(
 //                    context,
 //                    // Create the SelectionScreen in the next step.
 //                    MaterialPageRoute(
 //                        builder: (context) => HomePage()))
+//          common.getNavigator(context, Pages.getLoadingToHomePage, null);
         },
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
         highlightElevation: 0,

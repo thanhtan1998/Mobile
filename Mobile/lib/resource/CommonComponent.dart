@@ -1,10 +1,11 @@
+import 'package:eaw/resource/SharedPreferences.dart';
 import 'package:eaw/resource/urlEnum.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CommonComponent {
   int currentIndex = 0;
-  FirebaseUser firebaseUser;
+  String userName;
   static const TextStyle optionStyle =
   TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
   static const TextStyle bootomText =
@@ -47,7 +48,9 @@ class CommonComponent {
       ],
     );
   }
-
+  getUsername()async{
+    userName = await sharedRef.getStringValuesSF(ShareRef.userName);
+  }
   getAvatar(BuildContext context) {
     return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -72,7 +75,7 @@ class CommonComponent {
           ),
           Container(
             child: Text(
-              "Nguyễn Thanh Tân",
+              userName ,
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -86,12 +89,13 @@ class CommonComponent {
     currentIndex = index;
   }
 
-  String firstTimeBuild() {
+  Future<bool> firstTimeBuild() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     currentIndex = 0;
-    if (firebaseUser != null) {
-      return Pages.getLoadingToHomePage;
+    if (prefs.containsKey(ShareRef.tokenKey)) {
+      return true;
     } else {
-      return null;
+      return false;
     }
   }
 
@@ -125,7 +129,7 @@ class CommonComponent {
     );
   }
 
-  getNavigator(BuildContext context, String page, Map mapAgrument) {
+  getNavigator(BuildContext context, String page, Object mapAgrument) {
       Future<void>.microtask(() async {
         mapAgrument != null
             ? Navigator.pushReplacementNamed(context, page,

@@ -1,6 +1,11 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedReference {
+
+  removeAllObject()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+  }
   addStringToSF(String key, String stringValue) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(key, stringValue);
@@ -24,7 +29,7 @@ class SharedReference {
   getStringValuesSF(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String stringValue = prefs.getString(key);
-    return stringValue;
+    return Future.value(stringValue);
   }
 
   getBoolValuesSF(String key) async {
@@ -34,7 +39,7 @@ class SharedReference {
     return boolValue;
   }
 
-  getIntValuesSF(String key) async {
+   getIntValuesSF(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //Return int
     int intValue = prefs.getInt(key);
@@ -47,4 +52,4 @@ class SharedReference {
     double doubleValue = prefs.getDouble(key);
     return doubleValue;
   }
-}
+}final sharedRef = SharedReference();

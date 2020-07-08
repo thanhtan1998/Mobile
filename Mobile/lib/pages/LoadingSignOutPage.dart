@@ -21,7 +21,6 @@ class _LoadingSignOutPageState extends State<LoadingSignOutPage> {
 
   signOut() {
     googleBloc.signOutGoogle();
-    common.firebaseUser = null;
     common.getNavigator(context, Pages.getLoginPage, null);
   }
 
