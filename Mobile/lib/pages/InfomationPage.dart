@@ -8,7 +8,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class InformationPage extends StatefulWidget {
   BuildContext context;
 
@@ -21,6 +23,8 @@ class InformationPage extends StatefulWidget {
 class _InformationPageState extends State<InformationPage> {
   static final icon = Icon(Icons.edit);
   static final icon2 = Icon(Icons.block);
+  DateTime dateTime = DateTime.now();
+  DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
   Map<String, Icon> listOfTitle = {
     "Branch: ": icon2,
     "Store: ": icon2,
@@ -51,23 +55,32 @@ class _InformationPageState extends State<InformationPage> {
               stream: informationBloc.getInformationResponse,
               builder: (context, asyncSnapshot) {
                 informationResponse = asyncSnapshot.data;
-
-
-                  return Scaffold(
-                      resizeToAvoidBottomInset: false,
-                      appBar: common.getAppbar("Information", context),
-                      body:getBody(),
-                      bottomNavigationBar:
-                          common.getNavigationBar(context, null));
-
+                if (informationResponse != null) setMapData();
+                return Scaffold(
+                    resizeToAvoidBottomInset: false,
+                    appBar: common.getAppbar("Thông tin", context),
+                    body: getBody(),
+                    bottomNavigationBar:
+                        common.getNavigationBar(context, null));
               });
         });
   }
 
-loadDataBody(){
-  setMapData();
- return getContent();
-}
+  Future<void> showDate() async {
+    await showDatePicker(
+            context: context,
+            initialDate: dateTime,
+            firstDate: DateTime(DateTime.now().year),
+            lastDate: DateTime(DateTime.now().year + 2))
+        .then((value) {
+      // thiếu update API update birrthDay
+      setState(() {
+        if (value != null)
+          informationResponse.dayOfBirth = dateFormat.format(value);
+      });
+    });
+  }
+
   getBody() {
     return Container(
       width: common.getWidthContext(context),
@@ -91,9 +104,7 @@ loadDataBody(){
               ],
             ),
           ),
-          Container(
-            child:   informationResponse != null ? loadDataBody() : loadingData()
-          ),
+          Container(child: getContent()),
         ],
       ),
     );
@@ -112,26 +123,16 @@ loadDataBody(){
       ),
     );
   }
-  loadingData(){
-   return Column(
-     mainAxisAlignment: MainAxisAlignment.center,
-     crossAxisAlignment: CrossAxisAlignment.center,
-     children: <Widget>[
-       SizedBox(height: common.getHeightContext(context)/11,),
-       Container(
-         child: SpinKitWanderingCubes(
-           itemBuilder: (BuildContext context, int index) {
-             return DecoratedBox(
-               decoration: BoxDecoration(
-                 color: index.isEven ? Colors.white : Colors.green,
-               ),
-             );
-           },
-         ),
-       ),
-     ],
-   );
+
+  loadingData() {
+    return Container(
+      child: SpinKitFadingCircle(
+        color: Colors.white,
+        size: 10,
+      ),
+    );
   }
+
   getRow() {
     return listOfTitle.entries
         .map((e) => Container(
@@ -157,13 +158,15 @@ loadDataBody(){
                     child: Container(
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          getDataInMap(e.key), // map data
-                          style: GoogleFonts.lato(
-                              color: Colors.white,
+                        child: informationResponse != null
+                            ? Text(
+                                getDataInMap(e.key), // map data
+                                style: GoogleFonts.lato(
+                                    color: Colors.white,
 //                              fontWeight: FontWeight.bold,
-                              fontSize: 18),
-                        ),
+                                    fontSize: 18),
+                              )
+                            : loadingData(),
                       ),
                       decoration: BoxDecoration(
                           border: Border(
@@ -174,7 +177,9 @@ loadDataBody(){
                       )),
                     ),
                   ),
-                  getIcon(e.key,  getDataInMap(e.key), e.value)
+                  informationResponse != null
+                      ? getIcon(e.key, getDataInMap(e.key), e.value)
+                      : loadingData()
 //          )
                 ],
               ),
@@ -212,10 +217,12 @@ loadDataBody(){
           flex: 1,
           child: IconButton(
             icon: e,
-            onPressed: () => showDialog(
-              context: context,
-              builder: (context) => EditPage(title, oldValue),
-            ),
+            onPressed: () => title.trim().compareTo("BirthDay:") != 0
+                ? showDialog(
+                    context: context,
+                    builder: (context) => EditPage(title, oldValue),
+                  )
+                : showDate(),
           ));
     }
 

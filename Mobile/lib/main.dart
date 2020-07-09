@@ -1,6 +1,5 @@
-import 'package:eaw/pages/FCMHandle.dart';
 import 'package:eaw/pages/HistoryPage.dart';
-import 'package:eaw/pages/Home.dart';
+import 'package:eaw/pages/HomePage.dart';
 import 'package:eaw/pages/InfomationPage.dart';
 import 'package:eaw/pages/LoadingSignOutPage.dart';
 import 'package:eaw/pages/LoadingToHomePage.dart';

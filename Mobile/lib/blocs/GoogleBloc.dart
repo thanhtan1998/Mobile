@@ -1,11 +1,10 @@
 import 'package:eaw/dto/LoginRequest.dart';
 import 'package:eaw/repository/GoogleRepo.dart';
-import 'package:eaw/resource/CommonComponent.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rxdart/rxdart.dart';
 
 class GoogleBloc {
   GoogleRepo googleRepo = GoogleRepo();
+  // ignore: close_sinks
   final data = PublishSubject<LoginRequest>();
   Observable<LoginRequest> get getLoginRequest => data.stream;
 

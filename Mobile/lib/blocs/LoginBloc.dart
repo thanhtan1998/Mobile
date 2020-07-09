@@ -5,6 +5,7 @@ import 'package:rxdart/rxdart.dart';
 
 class LoginBloc {
   LoginRepo loginRepo = LoginRepo();
+  // ignore: close_sinks
   final data = BehaviorSubject<LoginResponse>();
 
   LoginResponse get getLoginResponse => data.value;

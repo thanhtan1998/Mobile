@@ -1,8 +1,4 @@
-import 'package:after_layout/after_layout.dart';
-import 'package:eaw/blocs/GoogleBloc.dart';
-import 'package:eaw/blocs/HomeBloc.dart';
 import 'package:eaw/blocs/LoginBloc.dart';
-import 'package:eaw/dto/HomeResponse.dart';
 import 'package:eaw/dto/LoginRequest.dart';
 import 'package:eaw/dto/LoginResponse.dart';
 import 'package:eaw/resource/CommonComponent.dart';
@@ -27,39 +23,38 @@ class _LoadingPageState extends State<LoadingToHomePage> {
   @override
   void initState() {
     super.initState();
-    common.firstTimeBuild().then((value) =>  WidgetsBinding.instance.addPostFrameCallback((_) => changePage(value)));
-
   }
 
-  void changePage(bool isFirstime) async {
-   if(!isFirstime){
-     Map data = ModalRoute.of(context).settings.arguments;
-     LoginRequest loginRequest = data['data'];
-     if (loginRequest != null) {
-       await loginBloc.checkLogin(loginRequest);
-       response = loginBloc.getLoginResponse;
-       if (response != null) {
-         sharedRef.addStringToSF(ShareRef.tokenKey, response.userToken);
-         sharedRef.addIntToSF(ShareRef.userId, response.userId);
-         await homeBloc.getHome(response.userToken, response.userId);
-         HomeResponse homeResponse = homeBloc.getHomeResponse;
-         if(homeResponse != null){
-           sharedRef.addStringToSF(ShareRef.userName, homeResponse.userName);
-           common.getUsername();
-           common.getNavigator(context, Pages.getHomePage, homeResponse);
-         }
-       } else {
-         common.getNavigator(context, Pages.getLoginPage, null);
-       }
-     }
-   }else{
-     common.getNavigator(context, Pages.getHomePage, null);
-   }
+  void checkLogin() async {
+    Map data = ModalRoute.of(context).settings.arguments;
+    LoginRequest loginRequest = data['data'];
+    if (loginRequest != null) {
+      await loginBloc.checkLogin(loginRequest);
+      response = loginBloc.getLoginResponse;
+      if (response != null) {
+        sharedRef.addStringToSF(ShareRef.tokenKey, response.userToken);
+        sharedRef.addIntToSF(ShareRef.userId, response.userId);
+        //  await homeBloc.getHome(response.userToken, response.userId);
+        //  HomeResponse homeResponse = homeBloc.getHomeResponse;
+        //  if(homeResponse != null){
+        //    sharedRef.addStringToSF(ShareRef.userName, homeResponse.userName);
+        //    common.getUsername();
+        //    common.getNavigator(context, Pages.getHomePage, homeResponse);
+        //  }
+        common.getNavigator(context, Pages.getHomePage, null);
+      } else {
+        common.getNavigator(context, Pages.getLoginPage, null);
+      }
+    }
   }
 
   BuildContext context;
 
-  _LoadingPageState(this.context);
+  _LoadingPageState(this.context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkLogin();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

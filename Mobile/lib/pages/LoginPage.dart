@@ -1,10 +1,8 @@
 import 'package:eaw/blocs/GoogleBloc.dart';
-import 'package:eaw/dto/LoginRequest.dart';
-import 'package:eaw/pages/LoadingToHomePage.dart';
 import 'package:eaw/resource/CommonComponent.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/material.dart';
-
+// ignore: must_be_immutable
 class LoginPage extends StatefulWidget {
   BuildContext context;
 
@@ -19,15 +17,6 @@ class _LoginPageState extends State<LoginPage> {
   String page;
 
   _LoginPageState(this.context);
-
-
-  @override
-  void initState() {
-//    page= common.firstTimeBuild();
-//    if(page != null){
-//      common.getNavigator(context, page, null);
-//    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,12 +60,6 @@ class _LoginPageState extends State<LoginPage> {
             if (event != null)
               common.getNavigator(context, Pages.getLoadingToHomePage, event);
           });
-//           Navigator.push(
-//                    context,
-//                    // Create the SelectionScreen in the next step.
-//                    MaterialPageRoute(
-//                        builder: (context) => HomePage()))
-//          common.getNavigator(context, Pages.getLoadingToHomePage, null);
         },
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
         highlightElevation: 0,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class HistoryPage extends StatefulWidget {
   BuildContext context;
 
@@ -26,7 +27,7 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: common.getAppbar("History", context),
+        appBar: common.getAppbar("Lịch sử", context),
         body: getBody(),
         bottomNavigationBar: common.getNavigationBar(context, null));
   }
@@ -142,7 +143,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
                 child: Center(
                   child: Text(
-                    "${startDate}",
+                    "$startDate",
                     style: TextStyle(fontSize: 14, color: Colors.white),
                   ),
                 ),
@@ -179,7 +180,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
                 child: Center(
                   child: Text(
-                    "${endDate}",
+                    "$endDate",
                     style: TextStyle(fontSize: 14, color: Colors.white),
                   ),
                 ),

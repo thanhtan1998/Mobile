@@ -1,5 +1,4 @@
 import 'package:eaw/dto/LoginRequest.dart';
-import 'package:eaw/resource/CommonComponent.dart';
 import 'package:eaw/resource/SharedPreferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class RequestPage extends StatefulWidget {
   String store;
   String branch;
@@ -84,7 +85,7 @@ class _RequestPageState extends State<RequestPage> {
                                       child: Padding(
                                         padding:
                                         const EdgeInsets.fromLTRB(8.0, 7, 0, 0),
-                                        child: Text("${branch}",
+                                        child: Text("$branch",
                                             style: TextStyle(
                                                 fontSize: 17,
                                                 fontWeight: FontWeight.bold)),
@@ -121,7 +122,7 @@ class _RequestPageState extends State<RequestPage> {
                                       child: Padding(
                                         padding:
                                         const EdgeInsets.fromLTRB(8.0, 7, 0, 0),
-                                        child: Text("${store}",
+                                        child: Text("$store",
                                             style: TextStyle(
                                                 fontSize: 17,
                                                 fontWeight: FontWeight.bold)),

@@ -1,6 +1,5 @@
 class InformationResponse {
-  String  phone, email, address, role, brand, dayOfBirth;
-
+  String  phone, email, address, role, brand,dayOfBirth;
   InformationResponse(
       {
       this.phone,

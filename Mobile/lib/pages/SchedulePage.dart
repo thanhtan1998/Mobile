@@ -5,9 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:intl/intl.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+// ignore: must_be_immutable
 class SchedulePage extends StatefulWidget {
   BuildContext context;
 
@@ -25,12 +24,11 @@ class _SchedulePageState extends State<SchedulePage> {
   DateTime thisMonday, thisSunday;
   BuildContext context;
 
-  _SchedulePageState(this.context);
+  _SchedulePageState(this.context){ getStartDate();}
 
   @override
   void initState() {
     super.initState();
-    getStartDate();
   }
 
   getStartDate() {
@@ -68,7 +66,7 @@ class _SchedulePageState extends State<SchedulePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: common.getAppbar("Schedule", context),
+        appBar: common.getAppbar("Lịch làm việc", context),
         body: getBody(),
         floatingActionButton: FloatingActionButton(
             onPressed: () => showDialog(
@@ -317,7 +315,7 @@ class _SchedulePageState extends State<SchedulePage> {
                 height: common.getHeightContext(context)/32,
                 child: Center(
                   child: Text(
-                    "${startDate}",
+                    "$startDate",
                     style: TextStyle(fontSize: 14, color: Colors.white),
                   ),
                 ),
@@ -347,7 +345,7 @@ class _SchedulePageState extends State<SchedulePage> {
 
                 child: Center(
                   child: Text(
-                    "${endDate}",
+                    "$endDate",
                     style: TextStyle(fontSize: 14, color: Colors.white),
                   ),
                 ),

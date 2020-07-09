@@ -1,6 +1,7 @@
 import 'package:eaw/resource/SharedPreferences.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CommonComponent {
@@ -35,14 +36,14 @@ class CommonComponent {
         PopupMenuButton(
             onSelected: (selection) {
               switch (selection) {
-                case "Sign Out":
+                case "Đăng xuất":
                   common.getNavigator(
                       context, Pages.getLoadingSignOutPage, null);
                   break;
               }
             },
             itemBuilder: (BuildContext context) {
-              return itemPopup.choices.map((e) =>
+              return ItemPopup.choices.map((e) =>
                   PopupMenuItem(value: e, child: Text(e))).toList();
             })
       ],
@@ -50,6 +51,7 @@ class CommonComponent {
   }
   getUsername()async{
     userName = await sharedRef.getStringValuesSF(ShareRef.userName);
+    return userName;
   }
   getAvatar(BuildContext context) {
     return Column(
@@ -74,17 +76,24 @@ class CommonComponent {
             height:6,
           ),
           Container(
-            child: Text(
-              userName ,
+            child:  userName != null ? Text(
+             userName  ,
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold),
-            ),
+            ) : loadingData(),
           )
         ]);
   }
-
+  loadingData() {
+    return Container(
+      child: SpinKitFadingCircle(
+        color: Colors.white,
+        size: 10,
+      ),
+    );
+  }
   showIndexBody(int index) {
     currentIndex = index;
   }
@@ -174,10 +183,10 @@ class CommonComponent {
   };
 }
 
-class itemPopup {
-  static const String SignOut = "Sign Out";
+class ItemPopup {
+  static const String SignOut = "Đăng xuất";
   static const List<String> choices = [SignOut];
 }
 
 final common = CommonComponent();
-final item = itemPopup();
+final item = ItemPopup();

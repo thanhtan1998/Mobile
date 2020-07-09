@@ -1,6 +1,3 @@
-import 'package:eaw/dto/User.dart';
-import 'package:eaw/resource/urlEnum.dart';
-import 'dart:convert';
 
 class UserProvider {
 //  Future<List<User>> getInfor() async {

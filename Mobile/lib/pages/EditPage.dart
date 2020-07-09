@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+// ignore: must_be_immutable
 class EditPage extends StatefulWidget {
   String title;
   String oldValue;
@@ -63,7 +63,7 @@ class _EditPageState extends State<EditPage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Text(
-                                "Old ${title}",
+                                "Old $title",
                                 style: TextStyle(
                                     fontSize: 17, fontWeight: FontWeight.bold),
                               ),
@@ -83,7 +83,7 @@ class _EditPageState extends State<EditPage> {
                                   child: Padding(
                                     padding:
                                         const EdgeInsets.fromLTRB(8.0, 7, 0, 0),
-                                    child: Text("${oldValue}",
+                                    child: Text("$oldValue",
                                         style: TextStyle(
                                             fontSize: 17,
                                             fontWeight: FontWeight.bold)),
@@ -100,7 +100,7 @@ class _EditPageState extends State<EditPage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Text(
-                                "New ${title}",
+                                "New $title",
                                 style: TextStyle(
                                     fontSize: 17, fontWeight: FontWeight.bold),
                               ),
