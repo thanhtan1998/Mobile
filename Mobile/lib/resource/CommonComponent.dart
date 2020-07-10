@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:eaw/resource/SharedPreferences.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CommonComponent {
   int currentIndex = 0;
   String userName;
+  MemoryImage avatar;
   static const TextStyle optionStyle =
   TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
   static const TextStyle bootomText =
@@ -17,7 +20,12 @@ class CommonComponent {
   getWidthContext(BuildContext context){
     return  MediaQuery.of(context).size.width;
   }
-
+  setImage(String stringBase64){
+    avatar = converImage.convertStringToImage(stringBase64);
+  }
+  getImage(){
+    return avatar;
+  }
   getAppbar(String title, BuildContext context) {
     return AppBar(
       title: Text(title),
@@ -49,8 +57,11 @@ class CommonComponent {
       ],
     );
   }
-  getUsername()async{
+  setUsername()async{
     userName = await sharedRef.getStringValuesSF(ShareRef.userName);
+    return userName;
+  }
+  getName(){
     return userName;
   }
   getAvatar(BuildContext context) {
@@ -67,7 +78,9 @@ class CommonComponent {
                     shape: BoxShape.circle,
                     image: new DecorationImage(
                         fit: BoxFit.fill,
-                        image: new AssetImage("assets/image.jpg"))),
+                        image:  getImage() != null
+                            ? getImage()
+                            : AssetImage("unknow.png"))),
 //                        image: new NetworkImage("@{common.firebaseUser.photoUrl}"))),
               ),
             ),
@@ -183,6 +196,13 @@ class CommonComponent {
   };
 }
 
+class ConvertImage{
+    MemoryImage convertStringToImage(String stringBase64){
+var image = base64.decode(stringBase64);
+return  MemoryImage(image);
+    }
+}
+
 class ItemPopup {
   static const String SignOut = "Đăng xuất";
   static const List<String> choices = [SignOut];
@@ -190,3 +210,4 @@ class ItemPopup {
 
 final common = CommonComponent();
 final item = ItemPopup();
+final converImage= ConvertImage();

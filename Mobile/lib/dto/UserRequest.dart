@@ -1,7 +1,0 @@
-
-
-class UserRequest{
-  String userId;
-
-
-}

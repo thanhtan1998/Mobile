@@ -280,7 +280,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                               ),
                                             ),
                                             Text("Ho Chi Minh",
-                                                style: TextStyle(fontSize: 15)),
+                                                style: TextStyle(fontSize: 13)),
                                           ],
                                         )),
                                     Expanded(

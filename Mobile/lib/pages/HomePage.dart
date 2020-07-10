@@ -102,7 +102,14 @@ class HomePageState extends State<HomePage> {
                     shape: BoxShape.circle,
                     image: new DecorationImage(
                         fit: BoxFit.fill,
-                        image: new AssetImage("assets/image.jpg"))),
+                        image: 
+                        // AssetImage("assets/unknow.png")
+                        common.getImage() != null
+                            ? common.getImage()
+                            : 
+                            AssetImage("assets/unknow.png") 
+                           
+                         )),
 //                        image: new NetworkImage("@{common.firebaseUser.photoUrl}"))),
               ),
             ),
@@ -111,17 +118,21 @@ class HomePageState extends State<HomePage> {
             height: 6,
           ),
           Container(
-            child: homeResponse != null
-                ? Text(
-                    homeResponse.userName,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
-                  )
-                : loadingData(),
+            child: common.getName() != null
+                ? getUserName(common.getName())
+                : homeResponse != null
+                    ? getUserName(homeResponse.userName)
+                    : loadingData(),
           )
         ]);
+  }
+
+  Text getUserName(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+          color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+    );
   }
 
   @override
@@ -136,7 +147,8 @@ class HomePageState extends State<HomePage> {
                 if (homeResponse != null) {
                   sharedRef.addStringToSF(
                       ShareRef.userName, homeResponse.userName);
-                  common.getUsername();
+                  common.setUsername();
+                  common.setImage(homeResponse.image);
                   setMapValue();
                 }
                 return Scaffold(
@@ -166,7 +178,7 @@ class HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-               getAvatar(),
+                getAvatar(),
               ],
             ),
           ),
@@ -196,7 +208,7 @@ class HomePageState extends State<HomePage> {
           Container(
 //              color: Colors.yellow,
               width: common.getWidthContext(context),
-              height: common.getHeightContext(context) / 2.4,
+              height: common.getHeightContext(context) / 2.5,
               child: getContent())
         ],
       ),
@@ -279,7 +291,7 @@ class HomePageState extends State<HomePage> {
             ? getContentByTitle(key.trim(), object)
             : Container(
                 child: Center(
-                    child: Text("Nội dung trống",
+                    child: Text("Đang cập nhật",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold))),
               );

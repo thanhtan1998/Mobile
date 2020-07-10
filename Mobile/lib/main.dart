@@ -13,7 +13,7 @@ void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     initialRoute: Pages.getLoginPage,
-//    initialRoute: Pages.getHomePage,
+  //  initialRoute: Pages.getHistoryPage,
     routes:<String, WidgetBuilder> {
       Pages.getLoginPage: (BuildContext context) => LoginPage(context),
       Pages.getHomePage: (BuildContext context) => HomePage(context),

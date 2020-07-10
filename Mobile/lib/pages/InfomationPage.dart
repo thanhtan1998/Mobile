@@ -71,7 +71,7 @@ class _InformationPageState extends State<InformationPage> {
             context: context,
             initialDate: dateTime,
             firstDate: DateTime(DateTime.now().year),
-            lastDate: DateTime(DateTime.now().year + 2))
+            lastDate: DateTime(DateTime.now().year -40))
         .then((value) {
       // thiếu update API update birrthDay
       setState(() {

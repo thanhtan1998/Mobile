@@ -11,11 +11,11 @@ class LastAttendance{
 
   factory LastAttendance.fromJson(Map<String, dynamic> json) {
     return new LastAttendance(
-        startDate: json['Start'],
-        endDate: json['End'],
-        address: json['address'],
-        storeName: json['storeName'],
-        totalTime: json['totalTime'],
-        workDate: json['workDate']);
+        startDate: json['Start']!= null ? json['Start'] : null,
+        endDate: json['End']!= null ? json['End'] : null,
+        address: json['address']!= null ? json['address'] : null,
+        storeName: json['storeName']!= null ? json['storeName'] : null,
+        totalTime: json['totalTime']!= null ? json['totalTime'] : null,
+        workDate: json['workDate']!= null ? json['workDate'] : null);
   }
 }
