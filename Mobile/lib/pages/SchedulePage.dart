@@ -1,11 +1,16 @@
 import 'dart:ui';
-import 'package:eaw/pages/RequestPage.dart';
+
+import 'package:eaw/blocs/ScheduleBloc.dart';
+import 'package:eaw/dto/Schedule.dart';
+import 'package:eaw/dto/ScheduleResponse.dart';
 import 'package:eaw/resource/CommonComponent.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+
 // ignore: must_be_immutable
 class SchedulePage extends StatefulWidget {
   BuildContext context;
@@ -19,12 +24,15 @@ class SchedulePage extends StatefulWidget {
 class _SchedulePageState extends State<SchedulePage> {
   DateTime dateTime = DateTime.now();
   DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
+  DateFormat dateFormat2 = new DateFormat("yyyy-MM-dd");
   String startDate, endDate;
   int dayNr;
   DateTime thisMonday, thisSunday;
   BuildContext context;
-
-  _SchedulePageState(this.context){ getStartDate();}
+  ScheduleResponse scheduleResponse;
+  _SchedulePageState(this.context) {
+    getStartDate();
+  }
 
   @override
   void initState() {
@@ -38,7 +46,6 @@ class _SchedulePageState extends State<SchedulePage> {
     startDate = dateFormat.format(thisMonday);
     thisSunday = thisMonday.add(new Duration(days: 6));
     endDate = dateFormat.format(thisSunday);
-    getDataByDay();
   }
 
   getNextOrPreviousWeek(int duration) {
@@ -48,41 +55,29 @@ class _SchedulePageState extends State<SchedulePage> {
     startDate = dateFormat.format(thisMonday);
     thisSunday = thisMonday.add(new Duration(days: 6));
     endDate = dateFormat.format(thisSunday);
-    getDataByDay();
-  }
-
-  getDataByDay() {
-    int count = 0;
-    common.mapDay.clear();
-    common.listDay.forEach((value) {
-      DateTime temp = thisMonday.subtract(new Duration(days: count));
-      String stringDate = "${temp.day} - ${temp.month}";
-      common.mapDay.putIfAbsent(value, () => stringDate);
-      count -= 1;
-    });
+    print(DateTime.parse(dateFormat2.format(thisMonday)));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: common.getAppbar("Lịch làm việc", context),
-        body: getBody(),
-        floatingActionButton: FloatingActionButton(
-            onPressed: () => showDialog(
-              context: context,
-              builder: (context) => RequestPage("7-11 FPT", "HCM-Ho Chi Minh"),
-            ),
-
-          child: Icon(Icons.add),
-          backgroundColor: Colors.blue,
-        ),
-        bottomNavigationBar: common.getNavigationBar(context, null));
+    return FutureBuilder(
+        future: scheduleBloc.getSchedule(
+            common.userToken,
+            common.userId,
+            DateTime.parse(dateFormat2.format(thisMonday)),
+            DateTime.parse(dateFormat2.format(thisSunday))),
+        builder: (context, AsyncSnapshot snapshot) {
+          return Scaffold(
+              resizeToAvoidBottomInset: false,
+              appBar: common.getAppbar("Lịch làm việc", context),
+              body: getBody(),
+              bottomNavigationBar: common.getNavigationBar(context, null));
+        });
   }
 
   getBody() {
     return Container(
-      width:common.getWidthContext(context),
+      width: common.getWidthContext(context),
       height: common.getHeightContext(context),
       decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -93,7 +88,7 @@ class _SchedulePageState extends State<SchedulePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Container(
-            width:common.getWidthContext(context),
+            width: common.getWidthContext(context),
             height: common.getHeightContext(context) / 3.5,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -105,9 +100,8 @@ class _SchedulePageState extends State<SchedulePage> {
           Padding(
             padding: const EdgeInsets.all(0),
             child: Container(
-                width:common.getWidthContext(context),
-                height: common.getHeightContext(context) /2,
-
+                width: common.getWidthContext(context),
+                height: common.getHeightContext(context) / 2,
                 child: getContent()),
           )
         ],
@@ -124,7 +118,7 @@ class _SchedulePageState extends State<SchedulePage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
               child: Container(
-                width:common.getWidthContext(context),
+                width: common.getWidthContext(context),
                 height: common.getHeightContext(context) / 18,
                 child: getRowPickDate(),
               ),
@@ -139,9 +133,19 @@ class _SchedulePageState extends State<SchedulePage> {
           height: common.getHeightContext(context) / 64,
         ),
         Container(
-            height: common.getHeightContext(context) /2.92,
-            child: getSchedule(common.mapDay, common.mapContent)),
+          height: common.getHeightContext(context) / 2.92,
+          child: getSchedule(),
+        )
       ],
+    );
+  }
+
+  loadingData() {
+    return Container(
+      child: SpinKitFadingCircle(
+        color: Colors.white,
+        size: 20,
+      ),
     );
   }
 
@@ -160,101 +164,214 @@ class _SchedulePageState extends State<SchedulePage> {
     });
   }
 
-  getSchedule(Map<String, String> days, Map<String, String> contentOfDay,
-      ) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.only(left:8.0,right: 8),
-        child: Column(
-            children: days.entries
-                .map((e) => Container(
-              height:  common.getHeightContext(context) / 13,
-                      child: Row(
-                        children: <Widget>[
-                          Opacity(
-                            opacity: 0.5,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.white,
-                              ),
-                              width:  common.getWidthContext(context) / 5.1,
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top:10.0),
-                                  child: Column(
-                                    children: <Widget>[
-                                       Text(
-                                          e.key,
-                                          style: GoogleFonts.lato(
-                                              textStyle: TextStyle(
-                                                  fontSize:18,
-                                                  fontWeight: FontWeight.bold)),
-                                        ),
-
-                                      Text(
-                                          e.value,
-                                          style: GoogleFonts.coda(
-                                              textStyle: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold)),
-                                        ),
-
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                              child: Opacity(
-                                opacity: 0.5,
-                                child: Container(
-                                    height:  common.getHeightContext(context) /13,
-                                    margin: EdgeInsets.only(left: 10),
+  getSchedule() {
+    return StreamBuilder<Object>(
+        stream: scheduleBloc.getHomeResponse,
+        builder: (context, snapshot) {
+          scheduleResponse = snapshot.data;
+          Iterable<MapEntry<String, Schedule>> listSchedule;
+          if (scheduleResponse != null) {
+            listSchedule = scheduleResponse.listOfSchedule.entries;
+          }
+          return listSchedule.isNotEmpty
+              ? ListView.builder(
+                  itemCount: listSchedule.length,
+                  itemBuilder: (context, index) => Container(
+                        width: common.getWidthContext(context),
+                        height: common.getHeightContext(context) / 9,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 2,
+                                child: Opacity(
+                                  opacity: 0.5,
+                                  child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
                                       color: Colors.white,
                                     ),
-//                              color: Color(int.parse(colors[e])),
-                                    child: SingleChildScrollView(
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 8.0, top: 8),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[getElementInMap(e.key)],
-                                        ),
+                                    width:
+                                        common.getWidthContext(context) / 5.1,
+                                    child: ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                          maxHeight:
+                                              common.getHeightContext(context) /
+                                                  9),
+                                      child: Center(
+                                        child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 10.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: <Widget>[
+                                                getTextBold2(
+                                                    " ${listSchedule.elementAt(index).key.substring(0, 3)}\n",
+                                                    "${getSubString(listSchedule.elementAt(index).key)}",
+                                                    20,
+                                                    24)
+                                              ],
+                                            )),
                                       ),
-                                    )),
-                              )),
-                        ],
-                      ),
-                      margin: EdgeInsets.only(bottom: 5),
-                    ))
-                .toList()),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 7,
+                                child: Opacity(
+                                  opacity: 0.5,
+                                  child: Container(
+                                      margin: EdgeInsets.only(left: 10),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: Colors.white,
+                                      ),
+                                      child: SingleChildScrollView(
+                                        child: ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxHeight: common
+                                                    .getHeightContext(context) /
+                                                9,
+                                          ),
+                                          child: scheduleResponse != null
+                                              ? getElementInMap(listSchedule
+                                                  .elementAt(index)
+                                                  .value)
+                                              : loadingData(),
+                                        ),
+                                      )),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        margin: EdgeInsets.only(bottom: 5),
+                      ))
+              : Center(child: getTextBold("", "Đang cập nhật", 20));
+        });
+  }
+
+  getElementInMap(Schedule schedule) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4.0, top: 2, bottom: 2, right: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: Container(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                        child:
+                            getTextBold("Cửa hàng: ", schedule.brandName, 14)),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                    flex: 2,
+                    child: Container(
+                        child: getTextBold("Từ: ", schedule.startDate, 14))),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Container(
+                        child: getTextBold("Đến: ", schedule.endDate, 14)),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                      child: getTextBold("Địa chỉ: ", schedule.address, 14)),
+                ),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
 
-  getElementInMap(String key) {
-    for (var i in common.mapContent.entries) {
-      if (i.key.compareTo(key) == 0)
-        return Text(
-          i.value,
-          style: TextStyle(
-              fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
-        );
-    }
+  getSubString(String string) {
+    return string.substring(string.length - 4).contains("\n")
+        ? string.substring(string.length - 3)
+        : string.substring(string.length - 4);
+  }
+
+  getTextBold(String title, String value, double size) {
+    return RichText(
+      text: TextSpan(
+        children: <TextSpan>[
+          TextSpan(
+            text: title,
+            style: TextStyle(color: Colors.black, fontSize: 14),
+          ),
+          TextSpan(
+            text: value,
+            style: TextStyle(
+                color: Colors.black.withOpacity(0.8),
+                fontSize: size,
+                fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  getTextBold2(String title, String value, double size1, double size2) {
+    return RichText(
+      text: TextSpan(
+        children: <TextSpan>[
+          TextSpan(
+            text: title,
+            style: TextStyle(
+                color: Colors.black.withOpacity(0.7),
+                fontSize: size1,
+                fontWeight: FontWeight.bold),
+          ),
+          TextSpan(
+            text: value,
+            style: TextStyle(
+                color: Colors.black.withOpacity(0.8),
+                fontSize: size2,
+                fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
   }
 
   getRowDateEvent() {
     return Padding(
-      padding: const EdgeInsets.only(left:8.0,right:8),
+      padding: const EdgeInsets.only(left: 8.0, right: 8),
       child: Container(
-        width:common.getWidthContext(context),
-        height:  common.getHeightContext(context) / 19,
+        width: common.getWidthContext(context),
+        height: common.getHeightContext(context) / 19,
         decoration: BoxDecoration(
             color: Color.fromRGBO(102, 140, 255, 1),
             borderRadius: BorderRadius.circular(8)),
@@ -263,10 +380,10 @@ class _SchedulePageState extends State<SchedulePage> {
             children: <Widget>[
               Expanded(
                 flex: 3,
-                child:Center(
-                  child: Text(
-                  "Date",
-                  style: GoogleFonts.coda(textStyle: TextStyle(fontSize: 18))),
+                child: Center(
+                  child: Text("Date",
+                      style:
+                          GoogleFonts.coda(textStyle: TextStyle(fontSize: 18))),
                 ),
               ),
               Expanded(
@@ -287,32 +404,32 @@ class _SchedulePageState extends State<SchedulePage> {
 
   getRowPickDate() {
     return Container(
-      width:common.getWidthContext(context),
+      width: common.getWidthContext(context),
       height: common.getHeightContext(context) / 6.4,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Container(
-            width: common.getWidthContext(context) / 9,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 18.0),
-              child: IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                tooltip: 'Previous Week',
-                onPressed: () {
-                  setState(() {
-                    getNextOrPreviousWeek(7);
-                  });
-                },
-              ),
+          Expanded(
+              child: RawMaterialButton(
+            onPressed: () {
+              setState(() {
+                getNextOrPreviousWeek(7);
+              });
+            },
+            elevation: 1.0,
+            fillColor: Color.fromRGBO(102, 140, 255, 1),
+            child: Icon(
+              Icons.arrow_back_ios,
+              size: 30.0,
             ),
-          ),
+            shape: CircleBorder(),
+          )),
           SizedBox(
-              width:  common.getWidthContext(context) / 4.3,
+              width: common.getWidthContext(context) / 4.3,
               child: Container(
                 margin: EdgeInsets.only(right: 6),
-                width: common.getWidthContext(context) /7.5,
-                height: common.getHeightContext(context)/32,
+                width: common.getWidthContext(context) / 7.5,
+                height: common.getHeightContext(context) / 32,
                 child: Center(
                   child: Text(
                     "$startDate",
@@ -321,13 +438,12 @@ class _SchedulePageState extends State<SchedulePage> {
                 ),
               )),
           Container(
-            width: common.getWidthContext(context) /3.5,
+            width: common.getWidthContext(context) / 3.5,
             child: OutlineButton(
                 color: Colors.black,
                 splashColor: Colors.grey,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(40)),
-//                    highlightElevation: 1,
                 borderSide: BorderSide(color: Colors.white),
                 child: Text("Pick Date",
                     style: TextStyle(
@@ -341,8 +457,7 @@ class _SchedulePageState extends State<SchedulePage> {
               child: Container(
                 margin: EdgeInsets.only(left: 6),
                 width: common.getWidthContext(context) / 4.2,
-                height: common.getHeightContext(context)/32,
-
+                height: common.getHeightContext(context) / 32,
                 child: Center(
                   child: Text(
                     "$endDate",
@@ -351,18 +466,20 @@ class _SchedulePageState extends State<SchedulePage> {
                 ),
               )),
           Expanded(
-//            width: common.getWidthContext(context) / 9,
-//            margin: EdgeInsets.only(left: 10),
-            child: IconButton(
-              icon: Icon(Icons.arrow_forward_ios),
-              tooltip: 'Next Week',
-              onPressed: () {
-                setState(() {
-                  getNextOrPreviousWeek(-7);
-                });
-              },
+              child: RawMaterialButton(
+            onPressed: () {
+              setState(() {
+                getNextOrPreviousWeek(7);
+              });
+            },
+            elevation: 1.0,
+            fillColor: Color.fromRGBO(102, 140, 255, 1),
+            child: Icon(
+              Icons.arrow_forward_ios,
+              size: 30.0,
             ),
-          ),
+            shape: CircleBorder(),
+          ))
         ],
       ),
     );

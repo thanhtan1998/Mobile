@@ -32,20 +32,20 @@ class _LoadingPageState extends State<LoadingToHomePage> {
       await loginBloc.checkLogin(loginRequest);
       response = loginBloc.getLoginResponse;
       if (response != null) {
-        sharedRef.addStringToSF(ShareRef.tokenKey, response.userToken);
-        sharedRef.addIntToSF(ShareRef.userId, response.userId);
-        //  await homeBloc.getHome(response.userToken, response.userId);
-        //  HomeResponse homeResponse = homeBloc.getHomeResponse;
-        //  if(homeResponse != null){
-        //    sharedRef.addStringToSF(ShareRef.userName, homeResponse.userName);
-        //    common.getUsername();
-        //    common.getNavigator(context, Pages.getHomePage, homeResponse);
-        //  }
+        setShareRefData(response);
+        common.setDataLogin();
         common.getNavigator(context, Pages.getHomePage, null);
       } else {
         common.getNavigator(context, Pages.getLoginPage, null);
       }
     }
+  }
+
+  setShareRefData(LoginResponse response) {
+    sharedRef.addStringToSF(ShareRef.tokenKey, response.userToken);
+    sharedRef.addIntToSF(ShareRef.userId, response.userId);
+    sharedRef.addStringToSF(ShareRef.userName, response.userName);
+    sharedRef.addStringToSF(ShareRef.image, response.image);
   }
 
   BuildContext context;

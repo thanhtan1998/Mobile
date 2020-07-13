@@ -23,16 +23,16 @@ class InformationPage extends StatefulWidget {
 class _InformationPageState extends State<InformationPage> {
   static final icon = Icon(Icons.edit);
   static final icon2 = Icon(Icons.block);
-  DateTime dateTime = DateTime.now();
+  DateTime dateTime;
   DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
   Map<String, Icon> listOfTitle = {
-    "Branch: ": icon2,
-    "Store: ": icon2,
-    "Position: ": icon2,
-    "Address: ": icon2,
-    "BirthDay: ": icon,
-    "Gmail: ": icon,
-    "Phone: ": icon,
+    "Branch": icon2,
+    "Store": icon2,
+    "Position": icon2,
+    "Address": icon,
+    "BirthDay": icon,
+    "Gmail": icon,
+    "Phone": icon,
   };
   Map<String, String> listOfContent;
   BuildContext context;
@@ -70,8 +70,8 @@ class _InformationPageState extends State<InformationPage> {
     await showDatePicker(
             context: context,
             initialDate: dateTime,
-            firstDate: DateTime(DateTime.now().year),
-            lastDate: DateTime(DateTime.now().year -40))
+            firstDate: DateTime(dateTime.year - 5),
+            lastDate: DateTime(dateTime.year + 5))
         .then((value) {
       // thiếu update API update birrthDay
       setState(() {
@@ -94,7 +94,6 @@ class _InformationPageState extends State<InformationPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Container(
-//            color: Colors.blue,
             width: common.getWidthContext(context),
             height: common.getHeightContext(context) / 3.3,
             child: Column(
@@ -115,7 +114,7 @@ class _InformationPageState extends State<InformationPage> {
       padding: const EdgeInsets.all(8.0),
       child: Container(
         width: common.getWidthContext(context),
-        height: common.getHeightContext(context) / 2.1,
+        height: common.getHeightContext(context) / 2.2,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: getRow(),
@@ -136,7 +135,7 @@ class _InformationPageState extends State<InformationPage> {
   getRow() {
     return listOfTitle.entries
         .map((e) => Container(
-              margin: EdgeInsets.only(top: 4),
+              margin: EdgeInsets.only(top: 2),
               width: common.getWidthContext(context),
               height: common.getHeightContext(context) / 17,
               child: Row(
@@ -188,15 +187,15 @@ class _InformationPageState extends State<InformationPage> {
   }
 
   setMapData() {
+    dateTime = DateTime.parse(informationResponse.dayOfBirth);
     listOfContent = Map<String, String>();
-    listOfContent.putIfAbsent("Branch:", () => informationResponse.brand);
-    listOfContent.putIfAbsent("Store:", () => "7-11 Fpt");
-    listOfContent.putIfAbsent("Position:", () => informationResponse.role);
-    listOfContent.putIfAbsent(
-        "BirthDay:", () => informationResponse.dayOfBirth);
-    listOfContent.putIfAbsent("Address:", () => informationResponse.address);
-    listOfContent.putIfAbsent("Gmail:", () => informationResponse.email);
-    listOfContent.putIfAbsent("Phone:", () => informationResponse.phone);
+    listOfContent.putIfAbsent("Branch", () => informationResponse.brand);
+    listOfContent.putIfAbsent("Store", () => "7-11 Fpt");
+    listOfContent.putIfAbsent("Position", () => informationResponse.role);
+    listOfContent.putIfAbsent("BirthDay", () => dateFormat.format(dateTime));
+    listOfContent.putIfAbsent("Address", () => informationResponse.address);
+    listOfContent.putIfAbsent("Gmail", () => informationResponse.email);
+    listOfContent.putIfAbsent("Phone", () => informationResponse.phone);
   }
 
   getDataInMap(String key) {
@@ -208,16 +207,15 @@ class _InformationPageState extends State<InformationPage> {
   }
 
   getIcon(String title, String oldValue, Icon e) {
-    if (title.trim() != "Store:" &&
-        title.trim() != "Branch:" &&
-        title.trim() != "Gmail:" &&
-        title.trim() != "Address:" &&
-        title.trim() != "Position:") {
+    if (title.trim() != "Store" &&
+        title.trim() != "Branch" &&
+        title.trim() != "Gmail" &&
+        title.trim() != "Position") {
       return Expanded(
           flex: 1,
           child: IconButton(
             icon: e,
-            onPressed: () => title.trim().compareTo("BirthDay:") != 0
+            onPressed: () => title.trim().compareTo("BirthDay") != 0
                 ? showDialog(
                     context: context,
                     builder: (context) => EditPage(title, oldValue),

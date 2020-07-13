@@ -8,24 +8,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CommonComponent {
   int currentIndex = 0;
-  String userName;
+  String userName, userToken;
+  int userId;
   MemoryImage avatar;
   static const TextStyle optionStyle =
-  TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
+      TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
   static const TextStyle bootomText =
-  TextStyle(fontWeight: FontWeight.bold, fontSize: 14);
-  getHeightContext(BuildContext context){
-    return  MediaQuery.of(context).size.height;
+      TextStyle(fontWeight: FontWeight.bold, fontSize: 14);
+  getHeightContext(BuildContext context) {
+    return MediaQuery.of(context).size.height;
   }
-  getWidthContext(BuildContext context){
-    return  MediaQuery.of(context).size.width;
+
+  getWidthContext(BuildContext context) {
+    return MediaQuery.of(context).size.width;
   }
-  setImage(String stringBase64){
-    avatar = converImage.convertStringToImage(stringBase64);
+
+  setDataLogin() async {
+    avatar = converImage.convertStringToImage(
+        await sharedRef.getStringValuesSF(ShareRef.image));
+    userName = await sharedRef.getStringValuesSF(ShareRef.userName);
+    userId = await sharedRef.getIntValuesSF(ShareRef.userId);
+    userToken = await sharedRef.getStringValuesSF(ShareRef.tokenKey);
   }
-  getImage(){
+
+  getImage() {
     return avatar;
   }
+
   getAppbar(String title, BuildContext context) {
     return AppBar(
       title: Text(title),
@@ -40,30 +49,31 @@ class CommonComponent {
         ),
       ),
       actions: <Widget>[
-        IconButton(icon: Icon(Icons.notifications,color: Colors.white,), onPressed: null),
-        PopupMenuButton(
-            onSelected: (selection) {
-              switch (selection) {
-                case "Đăng xuất":
-                  common.getNavigator(
-                      context, Pages.getLoadingSignOutPage, null);
-                  break;
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return ItemPopup.choices.map((e) =>
-                  PopupMenuItem(value: e, child: Text(e))).toList();
-            })
+        IconButton(
+            icon: Icon(
+              Icons.notifications,
+              color: Colors.white,
+            ),
+            onPressed: null),
+        PopupMenuButton(onSelected: (selection) {
+          switch (selection) {
+            case "Đăng xuất":
+              common.getNavigator(context, Pages.getLoadingSignOutPage, null);
+              break;
+          }
+        }, itemBuilder: (BuildContext context) {
+          return ItemPopup.choices
+              .map((e) => PopupMenuItem(value: e, child: Text(e)))
+              .toList();
+        })
       ],
     );
   }
-  setUsername()async{
-    userName = await sharedRef.getStringValuesSF(ShareRef.userName);
+
+  getName() {
     return userName;
   }
-  getName(){
-    return userName;
-  }
+
   getAvatar(BuildContext context) {
     return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -72,33 +82,36 @@ class CommonComponent {
             padding: const EdgeInsets.only(top: 20.0),
             child: Container(
               width: getWidthContext(context) / 2.5,
-              height:getHeightContext(context) / 4.6,
+              height: getHeightContext(context) / 4.6,
               child: Container(
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: new DecorationImage(
                         fit: BoxFit.fill,
-                        image:  getImage() != null
+                        image: getImage() != null
                             ? getImage()
-                            : AssetImage("unknow.png"))),
+                            : AssetImage("assets/unknow.png"))),
 //                        image: new NetworkImage("@{common.firebaseUser.photoUrl}"))),
               ),
             ),
           ),
           SizedBox(
-            height:6,
+            height: 6,
           ),
           Container(
-            child:  userName != null ? Text(
-             userName  ,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
-            ) : loadingData(),
+            child: userName != null
+                ? Text(
+                    userName,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                  )
+                : loadingData(),
           )
         ]);
   }
+
   loadingData() {
     return Container(
       child: SpinKitFadingCircle(
@@ -107,11 +120,12 @@ class CommonComponent {
       ),
     );
   }
+
   showIndexBody(int index) {
     currentIndex = index;
   }
 
-  Future<bool> firstTimeBuild() async{
+  Future<bool> firstTimeBuild() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currentIndex = 0;
     if (prefs.containsKey(ShareRef.tokenKey)) {
@@ -152,12 +166,12 @@ class CommonComponent {
   }
 
   getNavigator(BuildContext context, String page, Object mapAgrument) {
-      Future<void>.microtask(() async {
-        mapAgrument != null
-            ? Navigator.pushReplacementNamed(context, page,
-            arguments: {'data': mapAgrument})
-            : Navigator.pushReplacementNamed(context, page);
-      });
+    Future<void>.microtask(() async {
+      mapAgrument != null
+          ? Navigator.pushReplacementNamed(context, page,
+              arguments: {'data': mapAgrument})
+          : Navigator.pushReplacementNamed(context, page);
+    });
   }
 
   List listPage = [
@@ -175,7 +189,7 @@ class CommonComponent {
     "Sat",
     "Sun",
   ];
-  Map<String, String> mapDay={};
+  Map<String, String> mapDay = {};
   Map<String, String> mapContent = {
     'Mon': 'Hai Ba Trung Street',
     'Tue': 'You\'re free',
@@ -196,11 +210,11 @@ class CommonComponent {
   };
 }
 
-class ConvertImage{
-    MemoryImage convertStringToImage(String stringBase64){
-var image = base64.decode(stringBase64);
-return  MemoryImage(image);
-    }
+class ConvertImage {
+  MemoryImage convertStringToImage(String stringBase64) {
+    var image = base64.decode(stringBase64);
+    return MemoryImage(image);
+  }
 }
 
 class ItemPopup {
@@ -210,4 +224,4 @@ class ItemPopup {
 
 final common = CommonComponent();
 final item = ItemPopup();
-final converImage= ConvertImage();
+final converImage = ConvertImage();

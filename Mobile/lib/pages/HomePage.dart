@@ -1,6 +1,6 @@
 import 'package:eaw/blocs/HomeBloc.dart';
-import 'package:eaw/dto/LastAttendance.dart';
 import 'package:eaw/dto/HomeResponse.dart';
+import 'package:eaw/dto/LastAttendance.dart';
 import 'package:eaw/dto/NextWorkShift.dart';
 import 'package:eaw/resource/CommonComponent.dart';
 import 'package:eaw/resource/SharedPreferences.dart';
@@ -102,28 +102,18 @@ class HomePageState extends State<HomePage> {
                     shape: BoxShape.circle,
                     image: new DecorationImage(
                         fit: BoxFit.fill,
-                        image: 
-                        // AssetImage("assets/unknow.png")
-                        common.getImage() != null
-                            ? common.getImage()
-                            : 
-                            AssetImage("assets/unknow.png") 
-                           
-                         )),
-//                        image: new NetworkImage("@{common.firebaseUser.photoUrl}"))),
+                        image:
+                            // AssetImage("assets/unknow.png")
+                            common.getImage() != null
+                                ? common.getImage()
+                                : AssetImage("assets/unknow.png"))),
               ),
             ),
           ),
           SizedBox(
             height: 6,
           ),
-          Container(
-            child: common.getName() != null
-                ? getUserName(common.getName())
-                : homeResponse != null
-                    ? getUserName(homeResponse.userName)
-                    : loadingData(),
-          )
+          Container(child: getUserName(common.getName()))
         ]);
   }
 
@@ -145,10 +135,6 @@ class HomePageState extends State<HomePage> {
               builder: (context, snapshot) {
                 homeResponse = snapshot.data;
                 if (homeResponse != null) {
-                  sharedRef.addStringToSF(
-                      ShareRef.userName, homeResponse.userName);
-                  common.setUsername();
-                  common.setImage(homeResponse.image);
                   setMapValue();
                 }
                 return Scaffold(
@@ -288,7 +274,12 @@ class HomePageState extends State<HomePage> {
         break;
       default:
         return object != null
-            ? getContentByTitle(key.trim(), object)
+            ? SingleChildScrollView(
+                child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                        maxHeight: common.getHeightContext(context) / 7),
+                    child: getContentByTitle(key.trim(), object)),
+              )
             : Container(
                 child: Center(
                     child: Text("Đang cập nhật",
@@ -362,7 +353,7 @@ class HomePageState extends State<HomePage> {
                       ),
                     ),
                     Expanded(
-                      flex: 4,
+                      flex: 3,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Container(
@@ -379,7 +370,7 @@ class HomePageState extends State<HomePage> {
                 ),
               ),
               Expanded(
-                flex: 1,
+                flex: 2,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[

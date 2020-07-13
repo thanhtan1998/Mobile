@@ -13,17 +13,18 @@ void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     initialRoute: Pages.getLoginPage,
-  //  initialRoute: Pages.getHistoryPage,
-    routes:<String, WidgetBuilder> {
+    //  initialRoute: Pages.getHistoryPage,
+    routes: <String, WidgetBuilder>{
       Pages.getLoginPage: (BuildContext context) => LoginPage(context),
       Pages.getHomePage: (BuildContext context) => HomePage(context),
       Pages.getSchedulePage: (BuildContext context) => SchedulePage(context),
       Pages.getHistoryPage: (BuildContext context) => HistoryPage(context),
-      Pages.getInformationPage: (BuildContext context) => InformationPage(context),
-      Pages.getLoadingToHomePage: (BuildContext context) => LoadingToHomePage(context),
-      Pages.getLoadingSignOutPage: (BuildContext context) => LoadingSignOutPage(context),
+      Pages.getInformationPage: (BuildContext context) =>
+          InformationPage(context),
+      Pages.getLoadingToHomePage: (BuildContext context) =>
+          LoadingToHomePage(context),
+      Pages.getLoadingSignOutPage: (BuildContext context) =>
+          LoadingSignOutPage(context),
     },
-
   ));
-
 }

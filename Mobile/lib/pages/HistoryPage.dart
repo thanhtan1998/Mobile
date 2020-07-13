@@ -62,17 +62,6 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  getDataByDay() {
-    int count = 0;
-    common.mapDay.clear();
-    common.listDay.forEach((value) {
-      DateTime temp = thisMonday.subtract(new Duration(days: count));
-      String stringDate = "${temp.day} - ${temp.month}";
-      common.mapDay.putIfAbsent(value, () => stringDate);
-      count -= 1;
-    });
-  }
-
   getStartDate() {
     int today = dateTime.weekday;
     dayNr = (today + 6) % 7;
@@ -80,7 +69,6 @@ class _HistoryPageState extends State<HistoryPage> {
     startDate = dateFormat.format(thisMonday);
     thisSunday = thisMonday.add(new Duration(days: 6));
     endDate = dateFormat.format(thisSunday);
-    getDataByDay();
   }
 
   getNextOrPreviousWeek(int duration) {
@@ -90,7 +78,6 @@ class _HistoryPageState extends State<HistoryPage> {
     startDate = dateFormat.format(thisMonday);
     thisSunday = thisMonday.add(new Duration(days: 6));
     endDate = dateFormat.format(thisSunday);
-    getDataByDay();
   }
 
   showDate() {
@@ -111,36 +98,31 @@ class _HistoryPageState extends State<HistoryPage> {
   getRowPickDate() {
     return Container(
       width: common.getWidthContext(context),
-      height: common.getHeightContext(context) / 6,
+      height: common.getHeightContext(context) / 6.4,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Expanded(
-            flex: 1,
-            child: Center(
-              child: IconButton(
-                padding: EdgeInsets.only(right: 2),
-                icon: Icon(Icons.arrow_back_ios),
-                tooltip: 'Previous Week',
-                onPressed: () {
-                  setState(() {
-                    getNextOrPreviousWeek(7);
-                  });
-                },
-              ),
+              child: RawMaterialButton(
+            onPressed: () {
+              setState(() {
+                getNextOrPreviousWeek(7);
+              });
+            },
+            elevation: 1.0,
+            fillColor: Color.fromRGBO(102, 140, 255, 1),
+            child: Icon(
+              Icons.arrow_back_ios,
+              size: 30.0,
             ),
-          ),
-          Expanded(
-              flex: 3,
+            shape: CircleBorder(),
+          )),
+          SizedBox(
+              width: common.getWidthContext(context) / 4.3,
               child: Container(
-//                color: Colors.white12,
-//                margin: EdgeInsets.only(right: 6),
+                margin: EdgeInsets.only(right: 6),
                 width: common.getWidthContext(context) / 7.5,
                 height: common.getHeightContext(context) / 32,
-                decoration: BoxDecoration(
-                  //color: Colors.blue,
-                  borderRadius: BorderRadius.circular(10),
-                ),
                 child: Center(
                   child: Text(
                     "$startDate",
@@ -148,36 +130,27 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
                 ),
               )),
-          Expanded(
-            flex: 5,
-            child: Container(
-//              color: Colors.yellowAccent,
-//              width: common.getWidthContext(context) /5,
-              margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
-              child: OutlineButton(
-                  color: Colors.black,
-                  splashColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40)),
-//                    highlightElevation: 1,
-                  borderSide: BorderSide(color: Colors.white),
-                  child: Text("Pick Date",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      )),
-                  onPressed: showDate),
-            ),
+          Container(
+            width: common.getWidthContext(context) / 3.5,
+            child: OutlineButton(
+                color: Colors.black,
+                splashColor: Colors.grey,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40)),
+                borderSide: BorderSide(color: Colors.white),
+                child: Text("Pick Date",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    )),
+                onPressed: showDate),
           ),
-          Expanded(
-              flex: 3,
+          SizedBox(
+              width: common.getWidthContext(context) / 4.3,
               child: Container(
+                margin: EdgeInsets.only(left: 6),
                 width: common.getWidthContext(context) / 4.2,
                 height: common.getHeightContext(context) / 32,
-                decoration: BoxDecoration(
-                  //    color: Colors.blue,
-                  borderRadius: BorderRadius.circular(10),
-                ),
                 child: Center(
                   child: Text(
                     "$endDate",
@@ -186,25 +159,27 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
               )),
           Expanded(
-            flex: 1,
-            child: IconButton(
-              padding: EdgeInsets.only(right: 1),
-              icon: Icon(Icons.arrow_forward_ios),
-              tooltip: 'Next Week',
-              onPressed: () {
-                setState(() {
-                  getNextOrPreviousWeek(-7);
-                });
-              },
+              child: RawMaterialButton(
+            onPressed: () {
+              setState(() {
+                getNextOrPreviousWeek(7);
+              });
+            },
+            elevation: 1.0,
+            fillColor: Colors.blue,
+            child: Icon(
+              Icons.arrow_forward_ios,
+              size: 30.0,
             ),
-          ),
+            shape: CircleBorder(),
+          ))
         ],
       ),
     );
   }
 
   getListView() {
-    Iterable<MapEntry<String, String>> listMapDay= common.mapDay.entries;
+    Iterable<MapEntry<String, String>> listMapDay = common.mapDay.entries;
     return new ListView.builder(
       itemCount: listMapDay.length,
       padding: const EdgeInsets.all(16),

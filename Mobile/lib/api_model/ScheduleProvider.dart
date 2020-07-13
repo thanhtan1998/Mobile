@@ -1,12 +1,15 @@
 import 'dart:convert';
-import 'package:eaw/dto/HomeResponse.dart';
+import 'package:eaw/dto/ScheduleResponse.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:http/http.dart' as http;
 
-class HomeProvider {
-  Future<HomeResponse> getHome(String userToken, int userId) async {
-    HomeResponse homeResponse;
-    String url = BaseURL.baseURL + UrlApi.getHome + "?id=$userId";
+class ScheduleProvider {
+  Future<ScheduleResponse> getSchedule(String userToken, int userId,
+      DateTime startDate, DateTime endDate) async {
+    ScheduleResponse scheduleResponse;
+    String url = BaseURL.baseURL +
+        UrlApi.getSchedule +
+        "?id=$userId&firstDate=$startDate&lastDate=$endDate";
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -16,10 +19,10 @@ class HomeProvider {
     int statusCode = response.statusCode;
     if (statusCode == BaseURL.successCode) {
       final responseJson = json.decode(json.decode(response.body));
-      homeResponse = new HomeResponse.fromJson(responseJson);
+      scheduleResponse = new ScheduleResponse.fromJson(responseJson);
       print("object");
-      return homeResponse;
+      return scheduleResponse;
     }
-    return homeResponse;
+    return scheduleResponse;
   }
 }
