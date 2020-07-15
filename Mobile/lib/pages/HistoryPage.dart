@@ -1,7 +1,9 @@
+import 'package:eaw/blocs/HistoryBloc.dart';
+import 'package:eaw/dto/History.dart';
+import 'package:eaw/dto/HistoryResponse.dart';
 import 'package:eaw/resource/CommonComponent.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
@@ -15,27 +17,80 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  HistoryResponse historyResponse;
   DateTime dateTime = DateTime.now();
+  DateFormat dateFormat2 = new DateFormat("yyyy-MM-dd");
   DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
   String startDate, endDate;
   int dayNr;
   DateTime thisMonday, thisSunday;
   BuildContext context;
 
-  _HistoryPageState(this.context);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: common.getAppbar("Lịch sử", context),
-        body: getBody(),
-        bottomNavigationBar: common.getNavigationBar(context, null));
+  _HistoryPageState(this.context) {
+    getStartDate();
   }
 
   @override
-  void initState() {
-    super.initState();
-    getStartDate();
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: loadHistory(),
+        builder: (context, AsyncSnapshot snapshot) {
+          return Scaffold(
+              appBar: common.getAppbar("Lịch sử", context),
+              body: getBody(),
+              bottomNavigationBar: common.getNavigationBar(context, null));
+        });
+  }
+
+  getDiaglog(String image) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0)), //this right here
+            child: Container(
+              height: common.getHeightContext(context) / 3,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      width: common.getWidthContext(context) / 2,
+                      height: common.getHeightContext(context) / 4,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: converImage.convertStringToImage(image)),
+                          borderRadius: BorderRadius.circular(8)),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: OutlineButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Close"),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  loadHistory() async {
+    historyBloc.getHistory(
+        common.userToken,
+        common.userId,
+        DateTime.parse(dateFormat2.format(thisMonday)),
+        DateTime.parse(dateFormat2.format(thisSunday)));
   }
 
   getBody() {
@@ -162,7 +217,7 @@ class _HistoryPageState extends State<HistoryPage> {
               child: RawMaterialButton(
             onPressed: () {
               setState(() {
-                getNextOrPreviousWeek(7);
+                getNextOrPreviousWeek(-7);
               });
             },
             elevation: 1.0,
@@ -179,205 +234,404 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   getListView() {
-    Iterable<MapEntry<String, String>> listMapDay = common.mapDay.entries;
-    return new ListView.builder(
-      itemCount: listMapDay.length,
-      padding: const EdgeInsets.all(16),
-      itemBuilder: (context, i) {
-        return Container(
-          height: common.getHeightContext(context) / 6,
-          child: Card(
-            color: Colors.white70,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 5,
-                  child: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Container(
-                        width: common.getWidthContext(context) / 4.5,
-                        height: common.getHeightContext(context) / 7,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
+    return StreamBuilder<Object>(
+        stream: historyBloc.getHistoryResponse,
+        builder: (context, snapshot) {
+          historyResponse = snapshot != null ? snapshot.data : null;
+          Iterable<MapEntry<String, History>> listHistory = [];
+          if (historyResponse != null) {
+            listHistory = historyResponse.listOfHistory.entries;
+          }
+          return listHistory.isNotEmpty
+              ? ListView.builder(
+                  itemCount: listHistory.length,
+                  padding: const EdgeInsets.all(16),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      height: common.getHeightContext(context) / 5.5,
+                      child: Card(
+                        color: Colors.white70,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
                         ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text(
-                                listMapDay.elementAt(i).value,
-                                style: GoogleFonts.lato(
-                                    textStyle: TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                              Text(
-                                listMapDay.elementAt(i).key,
-                                style: GoogleFonts.lato(
-                                    textStyle: TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                            ],
-                          ),
-                        )),
-                  ),
-                ),
-                Expanded(
-                    flex: 9,
-                    child: Container(
-                      child: Column(
-                        children: <Widget>[
-                          Expanded(
-                              flex: 3,
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              flex: 5,
                               child: Padding(
-                                padding: const EdgeInsets.only(top: 5.0),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          children: <Widget>[
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 3.0, bottom: 4),
-                                              child: Text(
-                                                "Branch",
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                padding: EdgeInsets.all(10.0),
+                                child: Container(
+                                    width:
+                                        common.getWidthContext(context) / 4.5,
+                                    height:
+                                        common.getHeightContext(context) / 7,
+                                    decoration: BoxDecoration(
+                                      color: listHistory
+                                                  .elementAt(index)
+                                                  .value
+                                                  .imageCheckFace !=
+                                              null
+                                          ? Colors.green
+                                          : Colors.red,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(30.0)),
+                                    ),
+                                    child: RawMaterialButton(
+                                      onPressed: () {
+                                        listHistory
+                                                    .elementAt(index)
+                                                    .value
+                                                    .imageCheckFace !=
+                                                null
+                                            ? getDiaglog(listHistory
+                                                .elementAt(index)
+                                                .value
+                                                .imageCheckFace)
+                                            : getDialog(listHistory
+                                                .elementAt(index)
+                                                .value);
+                                      },
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          getTextBold2(
+                                              " ${listHistory.elementAt(index).key.substring(0, 3)}\n",
+                                              "${getSubString(listHistory.elementAt(index).key)}",
+                                              20,
+                                              24)
+                                        ],
+                                      ),
+                                    )),
+                              ),
+                            ),
+                            Expanded(
+                                flex: 9,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                        maxHeight:
+                                            common.getHeightContext(context) /
+                                                6),
+                                    child: Column(
+                                      children: <Widget>[
+                                        Expanded(
+                                            flex: 3,
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Expanded(
+                                                    flex: 1,
+                                                    child: Column(
+                                                      children: <Widget>[
+                                                        getTextBold(
+                                                            "Chi nhánh: ",
+                                                            listHistory
+                                                                .elementAt(
+                                                                    index)
+                                                                .value
+                                                                .brandName,
+                                                            16)
+                                                      ],
+                                                    )),
+                                                Expanded(
+                                                    flex: 1,
+                                                    child: Column(
+                                                      children: <Widget>[
+                                                        getTextBold(
+                                                            "Cửa hàng: ",
+                                                            listHistory
+                                                                .elementAt(
+                                                                    index)
+                                                                .value
+                                                                .storeName,
+                                                            16)
+                                                      ],
+                                                    )),
+                                              ],
+                                            )),
+                                        Expanded(
+                                            flex: 2,
+                                            child: Center(
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Expanded(
+                                                      flex: 1,
+                                                      child: getTextBold(
+                                                          "Giờ vào: ",
+                                                          listHistory
+                                                              .elementAt(index)
+                                                              .value
+                                                              .checkin,
+                                                          16)),
+                                                ],
                                               ),
-                                            ),
-                                            Text("Ho Chi Minh",
-                                                style: TextStyle(fontSize: 13)),
-                                          ],
-                                        )),
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          children: <Widget>[
-                                            Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 3.0, bottom: 4),
-                                                child: Text(
-                                                  "Store",
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                )),
-                                            Text("7-11 FPT Uni",
-                                                style: TextStyle(fontSize: 15)),
-                                          ],
-                                        )),
-                                  ],
-                                ),
-                              )),
-                          Expanded(
-                              flex: 3,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Expanded(
-                                      flex: 1,
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("Check In",
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold)),
-                                          SizedBox(
-                                            height: 3,
-                                          ),
-                                          Center(
-                                            child: Text("06:25 AM",
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    color: Colors.blueGrey)),
-                                          )
-                                        ],
-                                      )),
-                                  Expanded(
-                                      flex: 1,
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("Check Out",
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold)),
-                                          SizedBox(
-                                            height: 3,
-                                          ),
-                                          Center(
-                                            child: Text("06:25 PM",
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    color: Colors.blueGrey)),
-                                          ),
-                                        ],
-                                      )),
-                                ],
-                              )),
-//                          Expanded(
-//                            flex: 1,
-//                            child: Padding(
-//                              padding:
-//                                  const EdgeInsets.only(bottom: 7.0, right: 17),
-//                              child: Row(
-//                                mainAxisAlignment: MainAxisAlignment.end,
-//                                children: <Widget>[
-//                                  GestureDetector(
-//                                      onTap: () {},
-//                                      child: Container(
-//                                          width:
-//                                              common.getWidthContext(context) /
-//                                                  7,
-//                                          height:  common.getHeightContext(context) /
-//                                              15,
-//                                          decoration: BoxDecoration(
-//                                              gradient: LinearGradient(
-//                                                  begin: Alignment.topRight,
-//                                                  end: Alignment.bottomLeft,
-//                                                  colors: [
-//                                                    Colors.blue,
-//                                                    Colors.green
-//                                                  ]),
-//                                              borderRadius: BorderRadius.all(
-//                                                  Radius.circular(30))),
-//                                          child: Center(
-//                                              child: Text(
-//                                            "View",
-//
-//                                          )))),
-//                                ],
-//                              ),
-//                            ),
-//                          ),
-                        ],
+                                            )),
+                                        Expanded(
+                                            flex: 4,
+                                            child: getTextBold(
+                                                "Địa chỉ: ",
+                                                listHistory
+                                                    .elementAt(index)
+                                                    .value
+                                                    .address,
+                                                14))
+                                      ],
+                                    ),
+                                  ),
+                                )),
+                          ],
+                        ),
                       ),
-                    )),
-              ],
-            ),
+                    );
+                  },
+                )
+              : Center(child: getTextBold("", "Đang cập nhật", 20));
+        });
+  }
+
+  getSubString(String string) {
+    return string.substring(string.length - 4).contains("\n")
+        ? string.substring(string.length - 3)
+        : string.substring(string.length - 4);
+  }
+
+  getTextBold2(String title, String value, double size1, double size2) {
+    return RichText(
+      text: TextSpan(
+        children: <TextSpan>[
+          TextSpan(
+            text: title,
+            style: TextStyle(
+                color: Colors.black.withOpacity(0.7),
+                fontSize: size1,
+                fontWeight: FontWeight.bold),
           ),
-        );
-      },
+          TextSpan(
+            text: value,
+            style: TextStyle(
+                color: Colors.black.withOpacity(0.8),
+                fontSize: size2,
+                fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 
-  getElementInMap(String key) {
-    for (var i in common.mapContent.entries) {
-      if (i.key.compareTo(key) == 0)
-        return Text(
-          i.value,
-          style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-        );
-    }
+  RichText getTextBold(String title, String value, double size) {
+    return RichText(
+      text: TextSpan(
+        children: <TextSpan>[
+          TextSpan(
+            text: title,
+            style: TextStyle(color: Colors.black, fontSize: 14),
+          ),
+          TextSpan(
+            text: value,
+            style: TextStyle(
+                color: Colors.black.withOpacity(0.8),
+                fontSize: size,
+                fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  getDialog(History history) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0)), //this right here
+        child: Container(
+          height: 400,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12.0, 0, 12, 0),
+            child: Container(
+              height: 350,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                      height: 330,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            flex: 2,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 8.0, bottom: 8),
+                              child: Container(
+                                  width: 120,
+                                  decoration: BoxDecoration(
+                                      border: Border(
+                                    bottom: BorderSide(
+                                      color: Colors.black,
+                                      width: 1.0,
+                                    ),
+                                  )),
+                                  child: Center(
+                                    child: Text(
+                                      "Request",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 5,
+                            child: Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 4.0, bottom: 4),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: buildContainer("Chi nhánh",
+                                            "${history.brandName}"),
+                                        flex: 1,
+                                      ),
+                                      Expanded(
+                                        child: buildContainer(
+                                            "Cửa hàng", "${history.storeName}"),
+                                        flex: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 4.0, bottom: 4),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: buildContainer(
+                                              "Giờ vào", "${history.checkin}"),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: buildContainer("Ngày",
+                                              "${getSubString(history.date)}"),
+                                          flex: 1,
+                                        ),
+                                      ],
+                                    )),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            flex: 5,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 5.0),
+                              child: buildContent(),
+                            ),
+                          )
+                        ],
+                      )),
+                  Container(child: getButtonRequest())
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  getButtonRequest() {
+    return Container(
+      width: 320.0,
+      height: 40,
+      child: RaisedButton(
+        onPressed: () {},
+        child: Text(
+          "Request",
+          style: TextStyle(color: Colors.white),
+        ),
+        color: const Color(0xFF1BC0C5),
+      ),
+    );
+  }
+
+  buildContent() {
+    return Container(
+        child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Text(
+            "Content",
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+          ),
+        ),
+        SizedBox(
+          height: 5,
+        ),
+        Container(
+            height: 80,
+            width: 320,
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  border: Border.all(width: 1, color: Colors.black)),
+              child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8.0, 7, 0, 0),
+                  child: TextField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                        border: InputBorder.none, hintText: "Your content?"),
+                  )),
+            )),
+      ],
+    ));
+  }
+
+  buildContainer(String title, String value) {
+    return Container(
+        child: Row(
+      children: <Widget>[
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              "$title",
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Container(
+              width: common.getWidthContext(context) / 3,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  border: Border.all(width: 1, color: Colors.black)),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 2, 0, 0),
+                child: Text("$value",
+                    style:
+                        TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ));
   }
 }

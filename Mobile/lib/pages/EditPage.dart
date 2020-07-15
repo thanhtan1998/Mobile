@@ -161,7 +161,7 @@ class _EditPageState extends State<EditPage> {
   TextFormField buildTextField(bool isPhone) {
     return TextFormField(
       textCapitalization: TextCapitalization.words,
-      keyboardType: isPhone ? TextInputType.phone : TextInputType.text,
+      keyboardType: isPhone ? TextInputType.phone : TextInputType.multiline,
       decoration: InputDecoration(
         hintText: "New $title",
       ),

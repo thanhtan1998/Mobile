@@ -1,14 +1,15 @@
 import 'dart:convert';
-import 'package:eaw/dto/ScheduleResponse.dart';
+
+import 'package:eaw/dto/HistoryResponse.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:http/http.dart' as http;
 
-class ScheduleProvider {
-  Future<ScheduleResponse> getSchedule(String userToken, int userId,
+class HistoryProvider {
+  Future<HistoryResponse> getHistory(String userToken, int userId,
       DateTime startDate, DateTime endDate) async {
-    ScheduleResponse scheduleResponse;
+    HistoryResponse scheduleResponse;
     String url = BaseURL.baseURL +
-        UrlApi.getSchedule +
+        UrlApi.getHistory +
         "?id=$userId&firstDate=$startDate&lastDate=$endDate";
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -19,7 +20,8 @@ class ScheduleProvider {
     int statusCode = response.statusCode;
     if (statusCode == BaseURL.successCode) {
       final responseJson = json.decode(json.decode(response.body));
-      scheduleResponse = new ScheduleResponse.fromJson(responseJson);
+      scheduleResponse = new HistoryResponse.fromJson(responseJson);
+      print("object");
       return scheduleResponse;
     }
     return scheduleResponse;

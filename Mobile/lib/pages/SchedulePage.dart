@@ -110,34 +110,44 @@ class _SchedulePageState extends State<SchedulePage> {
   }
 
   getContent() {
-    return Column(
-      children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-              child: Container(
-                width: common.getWidthContext(context),
-                height: common.getHeightContext(context) / 18,
-                child: getRowPickDate(),
+    return StreamBuilder<Object>(
+        stream: scheduleBloc.getHomeResponse,
+        builder: (context, snapshot) {
+          scheduleResponse = snapshot.data;
+          Iterable<MapEntry<String, Schedule>> listSchedule = [];
+          if (scheduleResponse != null) {
+            listSchedule = scheduleResponse.listOfSchedule.entries;
+          }
+          return Column(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                    child: Container(
+                      width: common.getWidthContext(context),
+                      height: common.getHeightContext(context) / 18,
+                      child: getRowPickDate(),
+                    ),
+                  )
+                ],
               ),
-            )
-          ],
-        ),
-        SizedBox(
-          height: common.getHeightContext(context) / 100,
-        ),
-        getRowDateEvent(),
-        SizedBox(
-          height: common.getHeightContext(context) / 64,
-        ),
-        Container(
-          height: common.getHeightContext(context) / 2.92,
-          child: getSchedule(),
-        )
-      ],
-    );
+              SizedBox(
+                height: common.getHeightContext(context) / 100,
+              ),
+              getRowDateEvent(),
+              SizedBox(
+                height: common.getHeightContext(context) / 64,
+              ),
+              Container(
+                  height: common.getHeightContext(context) / 2.92,
+                  child: listSchedule.isNotEmpty
+                      ? getSchedule(listSchedule)
+                      : Center(child: getTextBold("", "Đang cập nhật", 20)))
+            ],
+          );
+        });
   }
 
   loadingData() {
@@ -164,96 +174,80 @@ class _SchedulePageState extends State<SchedulePage> {
     });
   }
 
-  getSchedule() {
-    return StreamBuilder<Object>(
-        stream: scheduleBloc.getHomeResponse,
-        builder: (context, snapshot) {
-          scheduleResponse = snapshot.data;
-          Iterable<MapEntry<String, Schedule>> listSchedule;
-          if (scheduleResponse != null) {
-            listSchedule = scheduleResponse.listOfSchedule.entries;
-          }
-          return listSchedule.isNotEmpty
-              ? ListView.builder(
-                  itemCount: listSchedule.length,
-                  itemBuilder: (context, index) => Container(
-                        width: common.getWidthContext(context),
-                        height: common.getHeightContext(context) / 9,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                flex: 2,
-                                child: Opacity(
-                                  opacity: 0.5,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      color: Colors.white,
-                                    ),
-                                    width:
-                                        common.getWidthContext(context) / 5.1,
-                                    child: ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                          maxHeight:
-                                              common.getHeightContext(context) /
-                                                  9),
-                                      child: Center(
-                                        child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 10.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                getTextBold2(
-                                                    " ${listSchedule.elementAt(index).key.substring(0, 3)}\n",
-                                                    "${getSubString(listSchedule.elementAt(index).key)}",
-                                                    20,
-                                                    24)
-                                              ],
-                                            )),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                flex: 7,
-                                child: Opacity(
-                                  opacity: 0.5,
-                                  child: Container(
-                                      margin: EdgeInsets.only(left: 10),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        color: Colors.white,
-                                      ),
-                                      child: SingleChildScrollView(
-                                        child: ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            maxHeight: common
-                                                    .getHeightContext(context) /
-                                                9,
-                                          ),
-                                          child: scheduleResponse != null
-                                              ? getElementInMap(listSchedule
-                                                  .elementAt(index)
-                                                  .value)
-                                              : loadingData(),
-                                        ),
-                                      )),
-                                ),
-                              )
-                            ],
+  getSchedule(Iterable<MapEntry<String, Schedule>> listSchedule) {
+    return ListView.builder(
+        itemCount: listSchedule.length,
+        itemBuilder: (context, index) => Container(
+              width: common.getWidthContext(context),
+              height: common.getHeightContext(context) / 9,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 2,
+                      child: Opacity(
+                        opacity: 0.5,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.white,
+                          ),
+                          width: common.getWidthContext(context) / 5.1,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                                maxHeight:
+                                    common.getHeightContext(context) / 9),
+                            child: Center(
+                              child: Padding(
+                                  padding: const EdgeInsets.only(top: 10.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      getTextBold2(
+                                          " ${listSchedule.elementAt(index).key.substring(0, 3)}\n",
+                                          "${getSubString(listSchedule.elementAt(index).key)}",
+                                          20,
+                                          24)
+                                    ],
+                                  )),
+                            ),
                           ),
                         ),
-                        margin: EdgeInsets.only(bottom: 5),
-                      ))
-              : Center(child: getTextBold("", "Đang cập nhật", 20));
-        });
+                      ),
+                    ),
+                    Expanded(
+                      flex: 7,
+                      child: Opacity(
+                        opacity: 0.5,
+                        child: Container(
+                            margin: EdgeInsets.only(left: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.white,
+                            ),
+                            child: SingleChildScrollView(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight:
+                                      common.getHeightContext(context) / 9,
+                                ),
+                                child: scheduleResponse != null
+                                    ? getElementInMap(
+                                        listSchedule.elementAt(index).value)
+                                    : loadingData(),
+                              ),
+                            )),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              margin: EdgeInsets.only(bottom: 5),
+            ));
+    //
   }
 
   getElementInMap(Schedule schedule) {
@@ -469,7 +463,7 @@ class _SchedulePageState extends State<SchedulePage> {
               child: RawMaterialButton(
             onPressed: () {
               setState(() {
-                getNextOrPreviousWeek(7);
+                getNextOrPreviousWeek(-7);
               });
             },
             elevation: 1.0,

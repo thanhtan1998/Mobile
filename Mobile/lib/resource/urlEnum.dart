@@ -9,6 +9,7 @@ class UrlApi {
   static final String getHome = "home";
   static final String getInformation = "information";
   static final String getSchedule = "schedule";
+  static final String getHistory = "history";
 }
 
 class ShareRef {
@@ -20,6 +21,7 @@ class ShareRef {
 
 class Pages {
   static final String getHomePage = "/home";
+  static final String getRequestPage = "/request";
   static final String getLoginPage = "/login";
   static final String getSchedulePage = "/schedule";
   static final String getHistoryPage = "/history";
