@@ -1,22 +1,27 @@
+import 'package:connectivity/connectivity.dart';
+import 'package:eaw/pages/ErrorPage.dart';
 import 'package:eaw/resource/CommonComponent.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class FirstTimePage extends StatefulWidget {
+  final BuildContext context;
+  FirstTimePage(this.context);
   @override
   _FirstTimePageState createState() => _FirstTimePageState();
 }
 
 class _FirstTimePageState extends State<FirstTimePage> {
-
-
-
-  _FirstTimePageState(){checkFirstTime();}
-  void checkFirstTime() async {
+  _FirstTimePageState() {
+    checkNetWork();
+  }
+  checkFirstTime() async {
     await common
         .firstTimeBuild()
         .then((value) => WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (value != null) {
+              if (value) {
                 common.getNavigator(context, Pages.getHomePage, null);
               } else {
                 common.getNavigator(context, Pages.getLoginPage, null);
@@ -24,8 +29,29 @@ class _FirstTimePageState extends State<FirstTimePage> {
             }));
   }
 
+  checkNetWork() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ErrorPage("Lỗi mạng", context)),
+      );
+    } else {
+      await checkFirstTime();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        color: Colors.blue[900],
+        child: Center(
+          child: SpinKitWave(
+            color: Colors.white,
+            size: 50.0,
+          ),
+        ));
   }
 }

@@ -14,6 +14,11 @@ class HistoryBloc {
         await historyRepo.getHistory(userToken, userId, startDate, endDate);
     data.sink.add(historyResponse);
   }
+
+  sendRequest(
+      String userToken, int userId, int workShiftId, String content) async {
+    await historyRepo.sendRequest(userToken, userId, workShiftId, content);
+  }
 }
 
 final HistoryBloc historyBloc = HistoryBloc();

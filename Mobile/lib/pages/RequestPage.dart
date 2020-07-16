@@ -4,11 +4,6 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class RequestPage extends StatefulWidget {
-  String store;
-  String branch;
-
-  RequestPage();
-
   @override
   _RequestPageState createState() => _RequestPageState();
 }

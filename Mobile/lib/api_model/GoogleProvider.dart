@@ -9,20 +9,25 @@ class GoogleProvider {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   LoginRequest loginRequest = LoginRequest();
-
   GoogleProvider() {
     firebaseMessaging.getToken().then((value) => loginRequest.fcmToken = value);
   }
-
   Future<LoginRequest> handleSignIn() async {
-    handleSignOut();
-    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-    final AuthCredential credential = GoogleAuthProvider.getCredential(accessToken: googleAuth.accessToken, idToken: googleAuth.idToken,);
-    final firebaseUser =
-        await (await _auth.signInWithCredential(credential)).user.getIdToken();
-    loginRequest.firebaseToken = firebaseUser.token;
+    try {
+      final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      final firebaseUser = await (await _auth.signInWithCredential(credential))
+          .user
+          .getIdToken();
+      loginRequest.firebaseToken = firebaseUser.token;
+    } catch (exception) {
+      print(exception.toString());
+    }
     return loginRequest;
   }
 

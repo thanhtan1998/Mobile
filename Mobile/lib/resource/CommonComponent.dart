@@ -180,34 +180,6 @@ class CommonComponent {
     Pages.getHistoryPage,
     Pages.getInformationPage
   ];
-  List<String> listDay = [
-    "Mon",
-    "Tue",
-    "Wed",
-    "Thu",
-    "Fri",
-    "Sat",
-    "Sun",
-  ];
-  Map<String, String> mapDay = {};
-  Map<String, String> mapContent = {
-    'Mon': 'Hai Ba Trung Street',
-    'Tue': 'You\'re free',
-    'Wed': 'Fpt University',
-    'Thu': 'Tay Hoa Street',
-    'Fri': 'Dai Lo 2 Street',
-    'Sat': 'You\'re free',
-    'Sun': 'You\'re free',
-  };
-  Map<String, String> mapColor = {
-    'Mon': '0xFFc7ff9f',
-    'Tue': '0xFFB71C1C',
-    'Wed': '0xFFBF360C',
-    'Thu': '0xFFE65100',
-    'Fri': '0xFFF57F17',
-    'Sat': '0xFF827717',
-    'Sun': '0xFF33691E',
-  };
 }
 
 class ConvertImage {

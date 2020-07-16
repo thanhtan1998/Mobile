@@ -17,6 +17,8 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController _editingController = TextEditingController();
   HistoryResponse historyResponse;
   DateTime dateTime = DateTime.now();
   DateFormat dateFormat2 = new DateFormat("yyyy-MM-dd");
@@ -267,10 +269,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                         common.getHeightContext(context) / 7,
                                     decoration: BoxDecoration(
                                       color: listHistory
-                                                  .elementAt(index)
-                                                  .value
-                                                  .imageCheckFace !=
-                                              null
+                                              .elementAt(index)
+                                              .value
+                                              .status
                                           ? Colors.green
                                           : Colors.red,
                                       borderRadius: BorderRadius.all(
@@ -321,35 +322,27 @@ class _HistoryPageState extends State<HistoryPage> {
                                             child: Row(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
                                               children: <Widget>[
                                                 Expanded(
                                                     flex: 1,
-                                                    child: Column(
-                                                      children: <Widget>[
-                                                        getTextBold(
-                                                            "Chi nhánh: ",
-                                                            listHistory
-                                                                .elementAt(
-                                                                    index)
-                                                                .value
-                                                                .brandName,
-                                                            16)
-                                                      ],
-                                                    )),
+                                                    child: getTextBold(
+                                                        "Chi nhánh:\n",
+                                                        listHistory
+                                                            .elementAt(index)
+                                                            .value
+                                                            .brandName,
+                                                        16)),
                                                 Expanded(
                                                     flex: 1,
-                                                    child: Column(
-                                                      children: <Widget>[
-                                                        getTextBold(
-                                                            "Cửa hàng: ",
-                                                            listHistory
-                                                                .elementAt(
-                                                                    index)
-                                                                .value
-                                                                .storeName,
-                                                            16)
-                                                      ],
-                                                    )),
+                                                    child: getTextBold(
+                                                        "Cửa hàng:\n",
+                                                        listHistory
+                                                            .elementAt(index)
+                                                            .value
+                                                            .storeName,
+                                                        16)),
                                               ],
                                             )),
                                         Expanded(
@@ -374,7 +367,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                               ),
                                             )),
                                         Expanded(
-                                            flex: 4,
+                                            flex: 5,
                                             child: getTextBold(
                                                 "Địa chỉ: ",
                                                 listHistory
@@ -431,7 +424,7 @@ class _HistoryPageState extends State<HistoryPage> {
         children: <TextSpan>[
           TextSpan(
             text: title,
-            style: TextStyle(color: Colors.black, fontSize: 14),
+            style: TextStyle(color: Colors.black, fontSize: 16),
           ),
           TextSpan(
             text: value,
@@ -480,7 +473,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                   )),
                                   child: Center(
                                     child: Text(
-                                      "Request",
+                                      "Yêu cầu",
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),
@@ -492,9 +485,8 @@ class _HistoryPageState extends State<HistoryPage> {
                             flex: 5,
                             child: Column(
                               children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 4.0, bottom: 4),
+                                Expanded(
+                                  flex: 1,
                                   child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
@@ -512,38 +504,41 @@ class _HistoryPageState extends State<HistoryPage> {
                                     ],
                                   ),
                                 ),
-                                Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 4.0, bottom: 4),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        Expanded(
-                                          child: buildContainer(
-                                              "Giờ vào", "${history.checkin}"),
-                                          flex: 1,
-                                        ),
-                                        Expanded(
-                                          child: buildContainer("Ngày",
-                                              "${getSubString(history.date)}"),
-                                          flex: 1,
-                                        ),
-                                      ],
-                                    )),
+                                Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: buildContainer(
+                                            "Giờ vào", "${history.checkin}"),
+                                        flex: 1,
+                                      ),
+                                      Expanded(
+                                        child: buildContainer("Ngày",
+                                            "${getSubString(history.date)}"),
+                                        flex: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                           Expanded(
                             flex: 5,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 5.0),
-                              child: buildContent(),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                buildContent(),
+                              ],
                             ),
                           )
                         ],
                       )),
-                  Container(child: getButtonRequest())
+                  Container(child: getButtonRequest(history.workshiftId))
                 ],
               ),
             ),
@@ -553,17 +548,48 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  getButtonRequest() {
+  getButtonRequest(int workShiftId) {
     return Container(
-      width: 320.0,
-      height: 40,
-      child: RaisedButton(
-        onPressed: () {},
-        child: Text(
-          "Request",
-          style: TextStyle(color: Colors.white),
-        ),
-        color: const Color(0xFF1BC0C5),
+      width: common.getWidthContext(context),
+      height: common.getHeightContext(context) / 20,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10),
+              child: RaisedButton(
+                onPressed: () {
+                  if (_formKey.currentState.validate()) {
+                    historyBloc.sendRequest(common.userToken, common.userId,
+                        workShiftId, _editingController.text);
+                  }
+                },
+                child: Text(
+                  "Gửi yêu cầu",
+                  style: TextStyle(color: Colors.white),
+                ),
+                color: const Color(0xFF1BC0C5),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10),
+              child: RaisedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  "Hủy bỏ",
+                  style: TextStyle(color: Colors.white),
+                ),
+                color: const Color(0xFF1BC0C5),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -576,29 +602,39 @@ class _HistoryPageState extends State<HistoryPage> {
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: Text(
-            "Content",
+            "Nội dung",
             style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
           ),
         ),
         SizedBox(
           height: 5,
         ),
-        Container(
-            height: 80,
-            width: 320,
-            child: Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                  border: Border.all(width: 1, color: Colors.black)),
-              child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 7, 0, 0),
-                  child: TextField(
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                        border: InputBorder.none, hintText: "Your content?"),
-                  )),
-            )),
+        Form(
+          key: _formKey,
+          child: Container(
+              height: common.getHeightContext(context) / 10,
+              width: common.getWidthContext(context) / 1.3,
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    border: Border.all(width: 1, color: Colors.black)),
+                child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 7, 0, 0),
+                    child: TextFormField(
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                          border: InputBorder.none, hintText: "Nội dung?"),
+                      validator: (value) {
+                        if (value.isEmpty || value == null) {
+                          return "Nội dung không thể để trống";
+                        }
+                        if (value.length > 200) return "Nội dung quá dài";
+                        return null;
+                      },
+                    )),
+              )),
+        ),
       ],
     ));
   }

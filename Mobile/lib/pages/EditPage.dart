@@ -1,3 +1,5 @@
+import 'package:eaw/blocs/InformationBloc.dart';
+import 'package:eaw/resource/CommonComponent.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +16,7 @@ class EditPage extends StatefulWidget {
 class _EditPageState extends State<EditPage> {
   String title;
   String oldValue;
+  TextEditingController _controller = TextEditingController();
   final formKey = GlobalKey<FormState>();
   _EditPageState();
 
@@ -22,26 +25,26 @@ class _EditPageState extends State<EditPage> {
     title = widget.title;
     oldValue = widget.oldValue;
     return Form(
-      key: formKey,
-      child: Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0)), //this right here
-        child: Container(
-          height: 300,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12.0, 0, 12, 0),
-            child: Container(
-              height: 350,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                      child: Column(
-                    children: <Widget>[
-                      Center(
+        key: formKey,
+        child: Dialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0)), //this right here
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+              child: Container(
+                height: common.getHeightContext(context) / 2.3,
+                width: common.getWidthContext(context) / 1.5,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Center(
+                            child: Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0, top: 4),
                           child: Container(
-                              width: 170,
-                              height: 40,
+                              width: common.getWidthContext(context) / 2.2,
+                              height: common.getHeightContext(context) / 15,
                               decoration: BoxDecoration(
                                   border: Border(
                                 bottom: BorderSide(
@@ -51,108 +54,140 @@ class _EditPageState extends State<EditPage> {
                               )),
                               child: Center(
                                 child: Text(
-                                  "Editing Information",
+                                  "Cập nhật thông tin",
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                 ),
-                              ))),
+                              )),
+                        )),
+                      ),
                       SizedBox(
-                        height: 20,
+                        height: 10,
                       ),
-                      Container(
-                          width: 320,
-                          height: 80,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Text(
-                                  "Old $title",
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold),
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                            height: common.getHeightContext(context) / 10,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    "$title",
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Container(
-                                  height: 40,
-                                  width: 250,
+                                Expanded(
+                                  flex: 3,
                                   child: Container(
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(8)),
                                         border: Border.all(
                                             width: 1, color: Colors.black)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          8.0, 7, 0, 0),
-                                      child: Text("$oldValue",
-                                          style: TextStyle(
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.bold)),
+                                    child: TextFormField(
+                                      enabled: false,
+                                      initialValue: "$oldValue",
+                                      maxLines: 4,
                                     ),
-                                  )),
-                            ],
-                          )),
-                      Container(
-                          width: 320,
-                          height: 80,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Text(
-                                  "New $title",
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Container(
-                                  height: 40,
-                                  width: 250,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8)),
-                                        border: Border.all(
-                                            width: 1, color: Colors.black)),
-                                    child:
-                                        buildTextField(title.contains("Phone")),
-                                  )),
-                            ],
-                          )),
-                    ],
-                  )),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: 320.0,
-                    height: 40,
-                    child: RaisedButton(
-                      onPressed: () {
-                        if (formKey.currentState.validate()) {}
-                      },
-                      child: Text(
-                        "Save",
-                        style: TextStyle(color: Colors.white),
+                              ],
+                            )),
                       ),
-                      color: const Color(0xFF1BC0C5),
-                    ),
-                  )
-                ],
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Expanded(
+                                flex: 3,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        "$title mới",
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Container(
+                                        width: common.getWidthContext(context),
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(8)),
+                                            border: Border.all(
+                                                width: 1, color: Colors.black)),
+                                        child: buildTextField(
+                                          title.contains("Số điện"),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                )),
+                            Expanded(
+                                flex: 2,
+                                child: Row(
+                                  children: <Widget>[
+                                    buildExpandedButton("Lưu lại", 1, () {
+                                      updateInfor(
+                                          common.userToken,
+                                          common.userId,
+                                          title,
+                                          _controller.text);
+                                    }),
+                                    buildExpandedButton("Hủy bỏ", 1, () {
+                                      Navigator.of(context).pop();
+                                    }),
+                                  ],
+                                )),
+                          ],
+                        ),
+                      ),
+                    ]),
               ),
-            ),
+            )));
+  }
+
+  updateInfor(
+      String userToken, int userId, String titleUpdate, Object value) async {
+    await informationBloc.updateInformation(
+        userToken, userId, titleUpdate, value);
+    Navigator.of(context).pop();
+  }
+
+  Expanded buildExpandedButton(String title, int flex, Function function) {
+    return Expanded(
+      flex: flex,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10.0, right: 10),
+        child: RaisedButton(
+          onPressed: () {
+            if (!title.contains("Hủy bỏ")) {
+              if (formKey.currentState.validate()) {
+                function();
+              }
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
+          child: Text(
+            "$title",
+            style: TextStyle(color: Colors.white),
           ),
+          color: const Color(0xFF1BC0C5),
         ),
       ),
     );
@@ -160,16 +195,29 @@ class _EditPageState extends State<EditPage> {
 
   TextFormField buildTextField(bool isPhone) {
     return TextFormField(
+      controller: _controller,
       textCapitalization: TextCapitalization.words,
       keyboardType: isPhone ? TextInputType.phone : TextInputType.multiline,
+      maxLines: 5,
       decoration: InputDecoration(
-        hintText: "New $title",
+        hintText: "$title mới",
       ),
       textInputAction: TextInputAction.next,
       validator: (value) {
-        if (value.isEmpty) {
-          return "$title is not empty";
+        String pattern = r'(^(?:[+0]9)?[0-9]{10,12}$)';
+        RegExp regExp = RegExp(pattern);
+        if (value.isEmpty || value.length == 0) {
+          return "$title không thể trống";
         }
+        if (title.contains("Số điện thoại")) {
+          if (value.length > 10 || value.length < 10) {
+            return "Số điện thoại chỉ 10 số";
+          }
+          if (!regExp.hasMatch(value)) {
+            return 'Chỉ nhập số';
+          }
+        }
+
         return null;
       },
     );

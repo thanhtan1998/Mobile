@@ -11,6 +11,7 @@ class GoogleBloc {
   signInGoogle() async {
     LoginRequest loginRequest = await googleRepo.signInGoogle();
     data.sink.add(loginRequest);
+    return true;
   }
 
   signOutGoogle() async {

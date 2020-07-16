@@ -2,6 +2,7 @@ import 'package:eaw/blocs/GoogleBloc.dart';
 import 'package:eaw/resource/CommonComponent.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/material.dart';
+
 // ignore: must_be_immutable
 class LoginPage extends StatefulWidget {
   BuildContext context;
@@ -20,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: getBodyLogin());
+    return Scaffold(resizeToAvoidBottomInset: false, body: getBodyLogin());
   }
 
   Widget getBodyLogin() {
@@ -55,12 +56,16 @@ class _LoginPageState extends State<LoginPage> {
         color: Colors.white,
         splashColor: Colors.grey,
         onPressed: () {
-          googleBloc.signInGoogle();
           googleBloc.getLoginRequest.listen((event) {
             if (event != null)
               common.getNavigator(context, Pages.getLoadingToHomePage, event);
           });
+          googleBloc.signInGoogle();
         },
+        //    bool isLogin = googleBloc.signInGoogle();
+        //     if (isLogin)
+        //       common.getNavigator(context, Pages.getLoadingToHomePage, googleBloc.getLoginRequest);
+        // },
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
         highlightElevation: 0,
         borderSide: BorderSide(color: Colors.grey),

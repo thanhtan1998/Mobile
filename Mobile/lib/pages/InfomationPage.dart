@@ -25,14 +25,15 @@ class _InformationPageState extends State<InformationPage> {
   static final icon2 = Icon(Icons.block);
   DateTime dateTime;
   DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
+  DateFormat dateFormat2 = new DateFormat("yyyy-MM-dd");
   Map<String, Icon> listOfTitle = {
-    "Branch": icon2,
-    "Store": icon2,
-    "Position": icon2,
-    "Address": icon,
-    "BirthDay": icon,
+    "Chi nhánh": icon2,
+    "Cừa hàng": icon2,
+    "Chức vụ": icon2,
+    "Địa chỉ": icon,
+    "Sinh nhật": icon,
     "Gmail": icon,
-    "Phone": icon,
+    "Số điện thoại": icon,
   };
   Map<String, String> listOfContent;
   BuildContext context;
@@ -74,10 +75,11 @@ class _InformationPageState extends State<InformationPage> {
             lastDate: DateTime(dateTime.year + 5))
         .then((value) {
       // thiếu update API update birrthDay
-      setState(() {
-        if (value != null)
-          informationResponse.dayOfBirth = dateFormat.format(value);
-      });
+      if (value != null)
+        informationResponse.dayOfBirth = dateFormat2.format(value);
+      informationBloc.updateInformation(common.userToken, common.userId,
+          "Sinh nhật", informationResponse.dayOfBirth);
+      dateTime = DateTime.parse(informationResponse.dayOfBirth);
     });
   }
 
@@ -147,7 +149,6 @@ class _InformationPageState extends State<InformationPage> {
                           style: GoogleFonts.aBeeZee(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
-//                              backgroundColor: Colors.white12
                             color: Colors.white,
                           )),
                     ),
@@ -161,9 +162,7 @@ class _InformationPageState extends State<InformationPage> {
                             ? Text(
                                 getDataInMap(e.key), // map data
                                 style: GoogleFonts.lato(
-                                    color: Colors.white,
-//                              fontWeight: FontWeight.bold,
-                                    fontSize: 18),
+                                    color: Colors.white, fontSize: 18),
                               )
                             : loadingData(),
                       ),
@@ -189,13 +188,13 @@ class _InformationPageState extends State<InformationPage> {
   setMapData() {
     dateTime = DateTime.parse(informationResponse.dayOfBirth);
     listOfContent = Map<String, String>();
-    listOfContent.putIfAbsent("Branch", () => informationResponse.brand);
-    listOfContent.putIfAbsent("Store", () => "7-11 Fpt");
-    listOfContent.putIfAbsent("Position", () => informationResponse.role);
-    listOfContent.putIfAbsent("BirthDay", () => dateFormat.format(dateTime));
-    listOfContent.putIfAbsent("Address", () => informationResponse.address);
+    listOfContent.putIfAbsent("Chi nhánh", () => informationResponse.brand);
+    listOfContent.putIfAbsent("Cừa hàng", () => "7-11 Fpt");
+    listOfContent.putIfAbsent("Chức vụ", () => informationResponse.role);
+    listOfContent.putIfAbsent("Sinh nhật", () => dateFormat.format(dateTime));
+    listOfContent.putIfAbsent("Địa chỉ", () => informationResponse.address);
     listOfContent.putIfAbsent("Gmail", () => informationResponse.email);
-    listOfContent.putIfAbsent("Phone", () => informationResponse.phone);
+    listOfContent.putIfAbsent("Số điện thoại", () => informationResponse.phone);
   }
 
   getDataInMap(String key) {
@@ -207,15 +206,15 @@ class _InformationPageState extends State<InformationPage> {
   }
 
   getIcon(String title, String oldValue, Icon e) {
-    if (title.trim() != "Store" &&
-        title.trim() != "Branch" &&
+    if (title.trim() != "Cừa hàng" &&
+        title.trim() != "Chi nhánh" &&
         title.trim() != "Gmail" &&
-        title.trim() != "Position") {
+        title.trim() != "Chức vụ") {
       return Expanded(
           flex: 1,
           child: IconButton(
             icon: e,
-            onPressed: () => title.trim().compareTo("BirthDay") != 0
+            onPressed: () => title.trim().compareTo("Sinh nhật") != 0
                 ? showDialog(
                     context: context,
                     builder: (context) => EditPage(title, oldValue),

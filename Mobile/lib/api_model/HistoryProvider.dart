@@ -21,9 +21,17 @@ class HistoryProvider {
     if (statusCode == BaseURL.successCode) {
       final responseJson = json.decode(json.decode(response.body));
       scheduleResponse = new HistoryResponse.fromJson(responseJson);
-      print("object");
       return scheduleResponse;
     }
     return scheduleResponse;
+  }
+
+  Future sendRequest(
+      String userToken, int userId, int workShiftId, String content) async {
+    String url = BaseURL.baseURL + UrlApi.sendRequest;
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String json =
+        '{"workShiftId": "$workShiftId", "content": "$content","id":$userId}';
+    await http.post(url, headers: headers, body: json);
   }
 }
