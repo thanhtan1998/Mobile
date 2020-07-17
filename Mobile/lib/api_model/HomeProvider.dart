@@ -17,7 +17,6 @@ class HomeProvider {
     if (statusCode == BaseURL.successCode) {
       final responseJson = json.decode(json.decode(response.body));
       homeResponse = new HomeResponse.fromJson(responseJson);
-      print("object");
       return homeResponse;
     }
     return homeResponse;

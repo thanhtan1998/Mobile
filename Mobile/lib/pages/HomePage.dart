@@ -133,10 +133,13 @@ class HomePageState extends State<HomePage> {
           return StreamBuilder(
               stream: homeBloc.getHomeResponse,
               builder: (context, snapshot) {
-                homeResponse = snapshot.data;
-                if (homeResponse != null) {
-                  setMapValue();
+                if (snapshot.hasData) {
+                  homeResponse = snapshot.data;
+                  if (homeResponse != null) {
+                    setMapValue();
+                  }
                 }
+
                 return Scaffold(
                     appBar: getAppbar("Trang chủ"),
                     body: getBody(),

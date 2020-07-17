@@ -32,6 +32,11 @@ class HistoryProvider {
     Map<String, String> headers = {"Content-type": "application/json"};
     String json =
         '{"workShiftId": "$workShiftId", "content": "$content","id":$userId}';
-    await http.post(url, headers: headers, body: json);
+    http.Response response = await http.post(url, headers: headers, body: json);
+    int statusCode = response.statusCode;
+    if (statusCode == BaseURL.successCode) {
+      return true;
+    }
+    return false;
   }
 }

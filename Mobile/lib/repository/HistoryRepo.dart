@@ -10,6 +10,6 @@ class HistoryRepo {
 
   Future sendRequest(
       String userToken, int userId, int workShiftId, String content) async {
-    await provider.sendRequest(userToken, userId, workShiftId, content);
+    return await provider.sendRequest(userToken, userId, workShiftId, content);
   }
 }

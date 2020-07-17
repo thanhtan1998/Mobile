@@ -74,7 +74,6 @@ class _InformationPageState extends State<InformationPage> {
             firstDate: DateTime(dateTime.year - 5),
             lastDate: DateTime(dateTime.year + 5))
         .then((value) {
-      // thiếu update API update birrthDay
       if (value != null)
         informationResponse.dayOfBirth = dateFormat2.format(value);
       informationBloc.updateInformation(common.userToken, common.userId,
@@ -113,7 +112,7 @@ class _InformationPageState extends State<InformationPage> {
 
   getContent() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
       child: Container(
         width: common.getWidthContext(context),
         height: common.getHeightContext(context) / 2.2,
@@ -139,7 +138,7 @@ class _InformationPageState extends State<InformationPage> {
         .map((e) => Container(
               margin: EdgeInsets.only(top: 2),
               width: common.getWidthContext(context),
-              height: common.getHeightContext(context) / 17,
+              height: common.getHeightContext(context) / 16,
               child: Row(
                 children: <Widget>[
                   Expanded(

@@ -561,8 +561,9 @@ class _HistoryPageState extends State<HistoryPage> {
               child: RaisedButton(
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
-                    historyBloc.sendRequest(common.userToken, common.userId,
-                        workShiftId, _editingController.text);
+                    sendRequest(workShiftId);
+                    Navigator.of(context).pop();
+                    showSuccessMessage();
                   }
                 },
                 child: Text(
@@ -594,6 +595,45 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
+  Future showSuccessMessage() {
+    return showDialog(
+        context: context,
+        builder: (context) => Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)), //this right here
+              child: Container(
+                height: common.getHeightContext(context) / 3,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "Gửi yêu cầu thành công",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: OutlineButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Close"),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ));
+  }
+
+  sendRequest(int workShiftId) async {
+    return await historyBloc.sendRequest(
+        common.userToken, common.userId, workShiftId, _editingController.text);
+  }
+
   buildContent() {
     return Container(
         child: Column(
@@ -613,7 +653,7 @@ class _HistoryPageState extends State<HistoryPage> {
           key: _formKey,
           child: Container(
               height: common.getHeightContext(context) / 10,
-              width: common.getWidthContext(context) / 1.3,
+              width: common.getWidthContext(context) / 1.6,
               child: Container(
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(8)),

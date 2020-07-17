@@ -17,7 +17,8 @@ class HistoryBloc {
 
   sendRequest(
       String userToken, int userId, int workShiftId, String content) async {
-    await historyRepo.sendRequest(userToken, userId, workShiftId, content);
+    return await historyRepo.sendRequest(
+        userToken, userId, workShiftId, content);
   }
 }
 

@@ -27,8 +27,8 @@ class _LoadingPageState extends State<LoadingToHomePage> {
 
   void checkLogin() async {
     Map data = ModalRoute.of(context).settings.arguments;
-    LoginRequest loginRequest = data['data'];
-    if (loginRequest != null) {
+    if (data != null) {
+      LoginRequest loginRequest = data['data'];
       await loginBloc.checkLogin(loginRequest);
       response = loginBloc.getLoginResponse;
       if (response != null) {
@@ -38,6 +38,9 @@ class _LoadingPageState extends State<LoadingToHomePage> {
       } else {
         common.getNavigator(context, Pages.getLoginPage, null);
       }
+    } else {
+      common.setDataLogin();
+      common.getNavigator(context, Pages.getHomePage, null);
     }
   }
 
