@@ -9,10 +9,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:barcode_scan/barcode_scan.dart';
 
-// ignore: must_be_immutable
 class HomePage extends StatefulWidget {
-  BuildContext context;
+  final BuildContext context;
 
   HomePage(this.context);
 
@@ -27,6 +27,7 @@ class HomePageState extends State<HomePage> {
   String startDate, endDate;
   int dayNr;
   DateTime thisMonday, thisSunday;
+  String stringScanner;
   Map<String, Object> listContent = {
     "Ca kế tiếp": null,
     "Tổng giờ trong tuần": null,
@@ -171,35 +172,60 @@ class HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Container(
-            width: common.getWidthContext(context),
-            height: common.getHeightContext(context) / 14,
-            color: Colors.black12,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: common.getWidthContext(context) / 3.5,
-                  child: Center(
-                      child: Text("Hôm nay",
-                          style: TextStyle(fontSize: 20, color: Colors.white))),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Text("${dateFormat.format(dateTime)}",
-                        style: TextStyle(fontSize: 20, color: Colors.white)),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          buildTitleBar(),
           Container(
 //              color: Colors.yellow,
               width: common.getWidthContext(context),
               height: common.getHeightContext(context) / 2.5,
               child: getContent())
         ],
+      ),
+    );
+  }
+
+  Container buildTitleBar() {
+    return Container(
+      width: common.getWidthContext(context),
+      height: common.getHeightContext(context) / 14,
+      color: Colors.black12,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            width: common.getWidthContext(context) / 3.5,
+            child: Center(
+                child: Text("Hôm nay",
+                    style: TextStyle(fontSize: 20, color: Colors.white))),
+          ),
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Text("${dateFormat.format(dateTime)}",
+                  style: TextStyle(fontSize: 20, color: Colors.white)),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: buildScanCameraButton(),
+          )
+        ],
+      ),
+    );
+  }
+
+  buildScanCameraButton() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.grey[400], borderRadius: BorderRadius.circular(8)),
+        child: OutlineButton(
+          onPressed: () async{
+            String codeSanner = await BarcodeScanner.scan();
+          },
+          child: Text("Scan QR"),
+        ),
       ),
     );
   }
