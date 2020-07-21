@@ -4,9 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ErrorPage extends StatefulWidget {
-  final String errorMess;
   final BuildContext context;
-  ErrorPage(this.errorMess, this.context);
+
+  ErrorPage(this.context);
   @override
   _ErrorPageState createState() => _ErrorPageState();
 }
@@ -14,38 +14,51 @@ class ErrorPage extends StatefulWidget {
 class _ErrorPageState extends State<ErrorPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(resizeToAvoidBottomInset: false, body: getBodyLogin());
-  }
-
-  getBodyLogin() {
-    return Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
+    return Scaffold(
+      appBar: AppBar(
+        title: Center(child: Text("Not Found")),
+      ),
+      body: Container(
+        width: common.getWidthContext(context),
+        height: common.getHeightContext(context),
         color: Colors.white,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Container(
-              height: common.getHeightContext(context) / 3,
-              width: common.getWidthContext(context) / 1.2,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/noInternet.jpg'),
-                  fit: BoxFit.fill,
-                ),
-                shape: BoxShape.rectangle,
-              ),
+            SizedBox(
+              height: 40,
             ),
             Container(
-              width: common.getWidthContext(context) / 3,
-              decoration: BoxDecoration(color: Colors.blueGrey),
+              height: common.getHeightContext(context) / 2,
+              width: common.getWidthContext(context) / 1.2,
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage("assets/notfound.png"))),
+            ),
+            Text(
+              "Tài khoản không tồn tại trong hệ thống",
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            Container(
+              color: Colors.grey,
+              height: common.getHeightContext(context) / 18,
+              width: common.getWidthContext(context) / 2,
               child: OutlineButton(
-                  onPressed: () {
-                    common.getNavigator(context, Pages.getFirstTimePage, null);
-                  },
-                  child: Text("Thử lại")),
+                onPressed: () {
+                  common.getNavigator(context, Pages.getLoginPage, null);
+                },
+                child: Text("Quay về trang đăng nhập"),
+              ),
             )
           ],
-        ));
+        ),
+      ),
+    );
   }
 }

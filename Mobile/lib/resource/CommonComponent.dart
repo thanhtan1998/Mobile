@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:connectivity/connectivity.dart';
+import 'package:eaw/pages/NoInternetPage.dart';
 import 'package:eaw/resource/SharedPreferences.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/material.dart';
@@ -180,12 +182,35 @@ class CommonComponent {
     Pages.getHistoryPage,
     Pages.getInformationPage
   ];
+  pushNointernetPage(BuildContext context, String pages) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => NoInternetPage(
+                context: context,
+                pages: pages,
+              )),
+    );
+  }
+
+  Future checkNetWork() async {
+    bool value = true;
+    ConnectivityResult result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      return value = false;
+    }
+    return value;
+  }
 }
 
 class ConvertImage {
   MemoryImage convertStringToImage(String stringBase64) {
-    var image = base64.decode(stringBase64);
-    return MemoryImage(image);
+    try {
+      var image = base64.decode(stringBase64);
+      return MemoryImage(image);
+    } catch (error) {
+      return null;
+    }
   }
 }
 

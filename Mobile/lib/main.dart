@@ -1,3 +1,4 @@
+import 'package:eaw/pages/ErrorPage.dart';
 import 'package:eaw/pages/FirstTimePage.dart';
 import 'package:eaw/pages/HistoryPage.dart';
 import 'package:eaw/pages/HomePage.dart';
@@ -14,8 +15,9 @@ void main() {
 //  runApp(MaterialApp(home: FcmHandler(),));
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
+    // initialRoute: Pages.getLoginPage,
     initialRoute: Pages.getFirstTimePage,
-    //  initialRoute: Pages.getHistoryPage,
+    // initialRoute: Pages.getNotFoundPage,
     routes: <String, WidgetBuilder>{
       Pages.getLoginPage: (BuildContext context) => LoginPage(context),
       Pages.getHomePage: (BuildContext context) => HomePage(context),
@@ -29,6 +31,7 @@ void main() {
       Pages.getLoadingSignOutPage: (BuildContext context) =>
           LoadingSignOutPage(context),
       Pages.getFirstTimePage: (BuildContext context) => FirstTimePage(context),
+      Pages.getNotFoundPage: (BuildContext context) => ErrorPage(context),
     },
   ));
 }

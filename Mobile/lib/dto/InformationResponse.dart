@@ -1,12 +1,13 @@
 class InformationResponse {
-  String phone, email, address, role, brand, dayOfBirth;
+  String phone, email, address, role, brand, dayOfBirth, storeName;
   InformationResponse(
       {this.phone,
       this.email,
       this.address,
       this.brand,
       this.role,
-      this.dayOfBirth});
+      this.dayOfBirth,
+      this.storeName});
 
   factory InformationResponse.fromJson(Map<String, dynamic> json) {
     return InformationResponse(
@@ -15,6 +16,7 @@ class InformationResponse {
       email: json["email"] != null ? json['email'] : null,
       phone: json["phone"] != null ? json['phone'] : null,
       role: json["role"] != null ? json['role'] : null,
+      storeName: json["store"] != null ? json["store"] : null,
       dayOfBirth: json["birthday"] != null ? json['birthday'] : null,
     );
   }

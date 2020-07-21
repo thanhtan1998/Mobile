@@ -90,11 +90,13 @@ class _SchedulePageState extends State<SchedulePage> {
           Container(
             width: common.getWidthContext(context),
             height: common.getHeightContext(context) / 3.5,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                common.getAvatar(context),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  common.getAvatar(context),
+                ],
+              ),
             ),
           ),
           Padding(

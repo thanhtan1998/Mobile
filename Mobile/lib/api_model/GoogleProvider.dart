@@ -1,4 +1,5 @@
 import 'package:eaw/dto/LoginRequest.dart';
+import 'package:eaw/resource/CommonComponent.dart';
 import 'package:eaw/resource/SharedPreferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -13,8 +14,12 @@ class GoogleProvider {
     firebaseMessaging.getToken().then((value) => loginRequest.fcmToken = value);
   }
   Future<LoginRequest> handleSignIn() async {
+    handleSignOut();
     try {
-      final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAccount googleUser =
+          await _googleSignIn.signIn().catchError((onError) {
+        print("Error $onError");
+      });
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.getCredential(
@@ -32,16 +37,9 @@ class GoogleProvider {
   }
 
   Future handleSignOut() async {
+    common.currentIndex = 0;
     await _auth.signOut();
     await _googleSignIn.signOut();
     sharedRef.removeAllObject();
-  }
-
-  Future checkLogin() async {
-//    final FirebaseUser user = await _auth.currentUser();
-//    if (user != null) {
-//      return common.firebaseUser;
-//    }
-//    return null;
   }
 }

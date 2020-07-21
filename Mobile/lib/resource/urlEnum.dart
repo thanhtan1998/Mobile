@@ -2,6 +2,7 @@ class BaseURL {
   static final String baseURL =
       "https://eawwebapi-dev-as.azurewebsites.net/api/v1/";
   static final int successCode = 200;
+  static final int notFoundCode = 404;
 }
 
 class UrlApi {
@@ -11,6 +12,7 @@ class UrlApi {
   static final String getSchedule = "schedule";
   static final String getHistory = "history";
   static final String sendRequest = "request";
+  static final String sendRequestQR = "Attendance";
   static final String updateInfor = "information";
 }
 
@@ -31,4 +33,6 @@ class Pages {
   static final String getLoadingToHomePage = "/loading";
   static final String getLoadingSignOutPage = "/logout";
   static final String getFirstTimePage = "/checkNetWork";
+  static final String getNotFoundPage = "/notfound";
+  static final String getNoInternetPage = "/noInternet";
 }

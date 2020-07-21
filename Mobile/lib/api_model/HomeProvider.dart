@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:eaw/dto/HomeResponse.dart';
+import 'package:eaw/dto/RequestQR.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,5 +21,24 @@ class HomeProvider {
       return homeResponse;
     }
     return homeResponse;
+  }
+
+  Future sendRequestAttendanceByQr(
+      RequestQr requestQr, String userToken) async {
+    String url = BaseURL.baseURL + UrlApi.sendRequestQR;
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $userToken',
+    };
+    String json =
+        '{"empCode": "${requestQr.empCode}","faceMachineCode": "${requestQr.faceMachineCode}","mode": "${requestQr.mode}","createTime": ${requestQr.createTime},' +
+            '"wifiName": "${requestQr.wifiName}"}';
+    http.Response response = await http.post(url, headers: headers, body: json);
+    int statusCode = response.statusCode;
+    if (statusCode == BaseURL.successCode) {
+      return true;
+    }
+    return false;
   }
 }
