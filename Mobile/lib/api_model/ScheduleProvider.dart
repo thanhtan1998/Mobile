@@ -15,7 +15,13 @@ class ScheduleProvider {
       'Accept': 'application/json',
       'Authorization': 'Bearer $userToken',
     };
-    http.Response response = await http.get(url, headers: headers);
+    http.Response response;
+    try {
+      response = await http.get(url, headers: headers);
+    } catch (e) {
+      print(e);
+      return null;
+    }
     int statusCode = response.statusCode;
     if (statusCode == BaseURL.successCode) {
       final responseJson = json.decode(json.decode(response.body));

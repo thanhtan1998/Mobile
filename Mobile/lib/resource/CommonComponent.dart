@@ -182,24 +182,18 @@ class CommonComponent {
     Pages.getHistoryPage,
     Pages.getInformationPage
   ];
-  pushNointernetPage(BuildContext context, String pages) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => NoInternetPage(
-                context: context,
-                pages: pages,
-              )),
-    );
-  }
-
-  Future checkNetWork() async {
-    bool value = true;
-    ConnectivityResult result = await Connectivity().checkConnectivity();
+  checkNetWork(BuildContext context) async {
+    var result = await Connectivity().checkConnectivity();
     if (result == ConnectivityResult.none) {
-      return value = false;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => NoInternetPage(
+                  context: context,
+                  pages: Pages.getFirstTimePage,
+                )),
+      );
     }
-    return value;
   }
 }
 

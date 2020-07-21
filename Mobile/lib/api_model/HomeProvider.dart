@@ -13,7 +13,13 @@ class HomeProvider {
       'Accept': 'application/json',
       'Authorization': 'Bearer $userToken',
     };
-    http.Response response = await http.get(url, headers: headers);
+    http.Response response;
+    try {
+      response = await http.get(url, headers: headers);
+    } catch (e) {
+      print(e);
+      return null;
+    }
     int statusCode = response.statusCode;
     if (statusCode == BaseURL.successCode) {
       final responseJson = json.decode(json.decode(response.body));
@@ -32,9 +38,15 @@ class HomeProvider {
       'Authorization': 'Bearer $userToken',
     };
     String json =
-        '{"empCode": "${requestQr.empCode}","faceMachineCode": "${requestQr.faceMachineCode}","mode": "${requestQr.mode}","createTime": ${requestQr.createTime},' +
+        '{"empCode": "${requestQr.empCode}","faceMachineCode": "${requestQr.faceMachineCode}","mode": "${requestQr.mode}","createTime": "${requestQr.createTime}",' +
             '"wifiName": "${requestQr.wifiName}"}';
-    http.Response response = await http.post(url, headers: headers, body: json);
+    http.Response response;
+    try {
+      response = await http.post(url, headers: headers, body: json);
+    } catch (e) {
+      print(e);
+      return null;
+    }
     int statusCode = response.statusCode;
     if (statusCode == BaseURL.successCode) {
       return true;

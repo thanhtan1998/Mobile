@@ -36,7 +36,7 @@ class _LoadingPageState extends State<LoadingToHomePage> {
         common.setDataLogin();
         common.getNavigator(context, Pages.getHomePage, null);
       } else {
-        common.getNavigator(context, Pages.getLoginPage, null);
+        common.getNavigator(context, Pages.getNotFoundPage, null);
       }
     } else {
       common.setDataLogin();

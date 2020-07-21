@@ -38,6 +38,11 @@ class _InformationPageState extends State<InformationPage> {
   Map<String, String> listOfContent;
   BuildContext context;
   InformationResponse informationResponse;
+  @override
+  void initState() {
+    common.checkNetWork(context);
+    super.initState();
+  }
 
   _InformationPageState(this.context);
 

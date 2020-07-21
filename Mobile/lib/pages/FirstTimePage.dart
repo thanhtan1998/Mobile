@@ -1,5 +1,5 @@
 import 'package:connectivity/connectivity.dart';
-import 'package:eaw/pages/ErrorPage.dart';
+import 'package:eaw/pages/NoInternetPage.dart';
 import 'package:eaw/resource/CommonComponent.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -34,9 +34,6 @@ class _FirstTimePageState extends State<FirstTimePage> {
         print('onResume: $message');
       },
     );
-    firebaseMessaging.getToken().then((token) {
-      print('FCM Token: $token');
-    });
   }
 
   _FirstTimePageState() {
@@ -59,7 +56,11 @@ class _FirstTimePageState extends State<FirstTimePage> {
     if (result == ConnectivityResult.none) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ErrorPage("Lỗi mạng", context)),
+        MaterialPageRoute(
+            builder: (context) => NoInternetPage(
+                  context: context,
+                  pages: Pages.getFirstTimePage,
+                )),
       );
     } else {
       await checkFirstTime();

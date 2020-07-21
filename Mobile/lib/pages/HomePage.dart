@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:connectivity/connectivity.dart';
 import 'package:eaw/blocs/HomeBloc.dart';
 import 'package:eaw/dto/HomeResponse.dart';
 import 'package:eaw/dto/LastAttendance.dart';
 import 'package:eaw/dto/NextWorkShift.dart';
+import 'package:eaw/dto/RequestQR.dart';
 import 'package:eaw/resource/CommonComponent.dart';
 import 'package:eaw/resource/SharedPreferences.dart';
 import 'package:eaw/resource/urlEnum.dart';
@@ -39,6 +43,12 @@ class HomePageState extends State<HomePage> {
   }
 
   HomeResponse homeResponse;
+
+  @override
+  void initState() {
+    common.checkNetWork(context);
+    super.initState();
+  }
 
   getHome() async {
     await homeBloc.getHome(await sharedRef.getStringValuesSF(ShareRef.tokenKey),
@@ -174,7 +184,6 @@ class HomePageState extends State<HomePage> {
           ),
           buildTitleBar(),
           Container(
-//              color: Colors.yellow,
               width: common.getWidthContext(context),
               height: common.getHeightContext(context) / 2.5,
               child: getContent())
@@ -221,11 +230,61 @@ class HomePageState extends State<HomePage> {
         decoration: BoxDecoration(
             color: Colors.grey[400], borderRadius: BorderRadius.circular(8)),
         child: OutlineButton(
-          onPressed: () async{
+          onPressed: () async {
             String codeSanner = await BarcodeScanner.scan();
+            var wifiName = await (Connectivity().getWifiName());
+            Map<String, dynamic> map = jsonDecode(codeSanner);
+            RequestQr requestQr = RequestQr(
+                faceMachineCode: map['faceMachineCode'],
+                createTime: map['createTime'],
+                empCode: homeResponse.empCode,
+                wifiName: wifiName);
+            bool result = await homeBloc.sendRequestAttendanceByQr(
+                requestQr, common.userToken);
+            showDialog(
+              context: context,
+              builder: (context) => Dialog(child: buildSuccessDialog(result)),
+            );
           },
           child: Text("Scan QR"),
         ),
+      ),
+    );
+  }
+
+  buildSuccessDialog(bool result) {
+    return result
+        ? buildContentDialog("assets/AGreat_Job_clip_art.gif")
+        : buildContentDialog("assets/failed.jpg");
+  }
+
+  buildContentDialog(String path) {
+    return Container(
+      color: Colors.blue,
+      width: common.getWidthContext(context) / 1.5,
+      height: common.getHeightContext(context) / 2.5,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            width: common.getWidthContext(context) / 1.5,
+            height: common.getHeightContext(context) / 4,
+            decoration: BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.rectangle,
+                image:
+                    DecorationImage(fit: BoxFit.fill, image: AssetImage(path))),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          RaisedButton(
+              child: Text("Đóng"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              })
+        ],
       ),
     );
   }

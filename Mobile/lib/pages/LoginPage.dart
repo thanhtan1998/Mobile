@@ -18,6 +18,11 @@ class _LoginPageState extends State<LoginPage> {
   String page;
 
   _LoginPageState(this.context);
+  @override
+  void initState() {
+    common.checkNetWork(context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

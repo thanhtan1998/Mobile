@@ -13,7 +13,7 @@ class NoInternetPage extends StatefulWidget {
 class _NoInternetPageState extends State<NoInternetPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(resizeToAvoidBottomInset: false, body: getBodyLogin());
+    return getBodyLogin();
   }
 
   getBodyLogin() {

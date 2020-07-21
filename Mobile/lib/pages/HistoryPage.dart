@@ -28,6 +28,12 @@ class _HistoryPageState extends State<HistoryPage> {
   DateTime thisMonday, thisSunday;
   BuildContext context;
 
+  @override
+  void initState() {
+    common.checkNetWork(context);
+    super.initState();
+  }
+
   _HistoryPageState(this.context) {
     getStartDate();
   }

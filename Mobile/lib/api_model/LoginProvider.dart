@@ -11,7 +11,13 @@ class LoginProvider {
     Map<String, String> headers = {"Content-type": "application/json"};
     String json =
         '{"firebaseToken": "${loginRequest.firebaseToken}", "tokenFcm": "${loginRequest.fcmToken}"}';
-    http.Response response = await http.post(url, headers: headers, body: json);
+    http.Response response;
+    try {
+      response = await http.post(url, headers: headers, body: json);
+    } catch (e) {
+      print(e);
+      return null;
+    }
     int statusCode = response.statusCode;
     if (statusCode == BaseURL.successCode) {
       final responseJson = jsonDecode(response.body);
