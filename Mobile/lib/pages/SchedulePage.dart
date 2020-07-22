@@ -99,13 +99,7 @@ class _SchedulePageState extends State<SchedulePage> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(0),
-            child: Container(
-                width: common.getWidthContext(context),
-                height: common.getHeightContext(context) / 2,
-                child: getContent()),
-          )
+          Expanded(child: getContent())
         ],
       ),
     );
@@ -142,8 +136,7 @@ class _SchedulePageState extends State<SchedulePage> {
               SizedBox(
                 height: common.getHeightContext(context) / 64,
               ),
-              Container(
-                  height: common.getHeightContext(context) / 2.92,
+              Expanded(
                   child: listSchedule.isNotEmpty
                       ? getSchedule(listSchedule)
                       : Center(child: getTextBold("", "Đang cập nhật", 20)))

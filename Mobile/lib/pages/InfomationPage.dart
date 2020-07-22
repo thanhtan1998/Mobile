@@ -109,7 +109,7 @@ class _InformationPageState extends State<InformationPage> {
               ],
             ),
           ),
-          Container(child: getContent()),
+          Expanded(child: getContent()),
         ],
       ),
     );

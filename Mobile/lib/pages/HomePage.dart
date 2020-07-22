@@ -183,10 +183,7 @@ class HomePageState extends State<HomePage> {
             ),
           ),
           buildTitleBar(),
-          Container(
-              width: common.getWidthContext(context),
-              height: common.getHeightContext(context) / 2.5,
-              child: getContent())
+          Expanded(child: getContent())
         ],
       ),
     );
