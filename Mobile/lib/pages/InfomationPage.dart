@@ -179,9 +179,10 @@ class _InformationPageState extends State<InformationPage> {
                       )),
                     ),
                   ),
-                  e.value != null
+                  informationResponse != null
                       ? getIcon(e.key, getDataInMap(e.key), e.value)
                       : loadingData()
+//          )
                 ],
               ),
             ))
@@ -192,7 +193,7 @@ class _InformationPageState extends State<InformationPage> {
     dateTime = DateTime.parse(informationResponse.dayOfBirth);
     listOfContent = Map<String, String>();
     listOfContent.putIfAbsent("Chi nhánh", () => informationResponse.brand);
-    listOfContent.putIfAbsent("Cừa hàng", () => informationResponse.storeName);
+    listOfContent.putIfAbsent("Cừa hàng", () => "7-11 Fpt");
     listOfContent.putIfAbsent("Chức vụ", () => informationResponse.role);
     listOfContent.putIfAbsent("Sinh nhật", () => dateFormat.format(dateTime));
     listOfContent.putIfAbsent("Địa chỉ", () => informationResponse.address);
@@ -201,7 +202,7 @@ class _InformationPageState extends State<InformationPage> {
   }
 
   getDataInMap(String key) {
-    String data = "Đang cập nhật";
+    String data = "error";
     if (listOfContent.containsKey(key.trim())) {
       data = listOfContent[key.trim()];
     }

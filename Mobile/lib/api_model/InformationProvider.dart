@@ -59,6 +59,7 @@ class InformationProvider {
     if (statusCode == BaseURL.successCode) {
       final responseJson = json.decode(json.decode(response.body));
       informationResponse = new InformationResponse.fromJson(responseJson);
+      print("object");
       return informationResponse;
     }
     return informationResponse;
