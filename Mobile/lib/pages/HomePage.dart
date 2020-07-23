@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:barcode_scan/barcode_scan.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:eaw/blocs/HomeBloc.dart';
 import 'package:eaw/dto/HomeResponse.dart';
@@ -11,9 +13,10 @@ import 'package:eaw/resource/SharedPreferences.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
-import 'package:barcode_scan/barcode_scan.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
   final BuildContext context;
@@ -31,7 +34,9 @@ class HomePageState extends State<HomePage> {
   String startDate, endDate;
   int dayNr;
   DateTime thisMonday, thisSunday;
-  String stringScanner;
+  String stringScanner, wifiName;
+  ConnectivityResult connectivityResult;
+  final Connectivity _connectivity = Connectivity();
   Map<String, Object> listContent = {
     "Ca kế tiếp": null,
     "Tổng giờ trong tuần": null,
@@ -39,7 +44,6 @@ class HomePageState extends State<HomePage> {
   };
   HomePageState(this.context) {
     getStartDate();
-    // setMapValue();
   }
 
   HomeResponse homeResponse;
@@ -48,6 +52,48 @@ class HomePageState extends State<HomePage> {
   void initState() {
     common.checkNetWork(context);
     super.initState();
+  }
+
+  Future<void> initConnectivity() async {
+    ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      print(e.toString());
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+    if (Platform.isAndroid) {
+      var status = await Permission.location.status;
+      if (status.isUndetermined || status.isDenied || status.isRestricted) {
+        if (await Permission.location.request().isGranted) {
+          print('Location permission granted');
+        } else {
+          print('Location permission not granted');
+        }
+      } else {
+        print('Permission already granted (previous execution?)');
+      }
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    switch (result) {
+      case ConnectivityResult.wifi:
+        wifiName = await _connectivity.getWifiName();
+        break;
+      case ConnectivityResult.mobile:
+        wifiName = "Mobile Network";
+        break;
+      case ConnectivityResult.none:
+        wifiName = "Network Error";
+        break;
+    }
   }
 
   getHome() async {
@@ -228,8 +274,8 @@ class HomePageState extends State<HomePage> {
             color: Colors.grey[400], borderRadius: BorderRadius.circular(8)),
         child: OutlineButton(
           onPressed: () async {
+            initConnectivity();
             String codeSanner = await BarcodeScanner.scan();
-            var wifiName = await (Connectivity().getWifiName());
             Map<String, dynamic> map = jsonDecode(codeSanner);
             RequestQr requestQr = RequestQr(
                 faceMachineCode: map['faceMachineCode'],
