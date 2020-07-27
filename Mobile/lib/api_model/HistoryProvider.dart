@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 class HistoryProvider {
   Future<HistoryResponse> getHistory(String userToken, int userId,
       DateTime startDate, DateTime endDate) async {
-    HistoryResponse scheduleResponse;
+    HistoryResponse historyResponse;
     String url = BaseURL.baseURL +
         UrlApi.getHistory +
         "?id=$userId&firstDate=$startDate&lastDate=$endDate";
@@ -26,18 +26,22 @@ class HistoryProvider {
     int statusCode = response.statusCode;
     if (statusCode == BaseURL.successCode) {
       final responseJson = json.decode(json.decode(response.body));
-      scheduleResponse = new HistoryResponse.fromJson(responseJson);
-      return scheduleResponse;
+      historyResponse = new HistoryResponse.fromJson(responseJson);
+      return historyResponse;
     }
-    return scheduleResponse;
+    return historyResponse;
   }
 
-  Future sendRequest(
-      String userToken, int userId, int workShiftId, String content) async {
+  Future sendRequest(String userToken, int userId, String createTime,
+      String content, String wifiName) async {
     String url = BaseURL.baseURL + UrlApi.sendRequest;
-    Map<String, String> headers = {"Content-type": "application/json"};
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $userToken',
+    };
     String json =
-        '{"workShiftId": "$workShiftId", "content": "$content","id":$userId}';
+        '{ "createTime": "$createTime", "content": "$content", "nameWifi": "$wifiName", "id": $userId}';
     http.Response response = await http.post(url, headers: headers, body: json);
     int statusCode = response.statusCode;
     if (statusCode == BaseURL.successCode) {

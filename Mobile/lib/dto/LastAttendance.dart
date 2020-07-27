@@ -1,21 +1,13 @@
-
-class LastAttendance{
-  String startDate,endDate,totalTime,storeName,address,workDate;
+class LastAttendance {
+  String date, mode, time, storeName, status;
   LastAttendance(
-      {this.startDate,
-      this.endDate,
-      this.workDate,
-      this.totalTime,
-      this.storeName,
-      this.address});
-
+      {this.date, this.mode, this.storeName, this.status, this.time});
   factory LastAttendance.fromJson(Map<String, dynamic> json) {
     return new LastAttendance(
-        startDate: json['Start']!= null ? json['Start'] : null,
-        endDate: json['End']!= null ? json['End'] : null,
-        address: json['address']!= null ? json['address'] : null,
-        storeName: json['storeName']!= null ? json['storeName'] : null,
-        totalTime: json['totalTime']!= null ? json['totalTime'] : null,
-        workDate: json['workDate']!= null ? json['workDate'] : null);
+        status: json['status'] != null ? json['status'] : null,
+        mode: json['mode'] != null ? json['mode'] : null,
+        storeName: json['Store'] != null ? json['Store'] : null,
+        date: json['date'] != null ? json['date'] : null,
+        time: json['time'] != null ? json['time'] : null);
   }
 }

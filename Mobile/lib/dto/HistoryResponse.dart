@@ -1,15 +1,16 @@
 import 'package:eaw/dto/History.dart';
 
 class HistoryResponse {
-  Map<String, History> listOfHistory;
+  List<History> listOfHistory;
   HistoryResponse({this.listOfHistory});
   factory HistoryResponse.fromJson(Map<String, dynamic> json) {
-    List listData = json['schedule'] != null ? json['schedule'] : null;
-    Map<String, History> map = Map();
+    List listData =
+        json['HistoryAttendance'] != null ? json['HistoryAttendance'] : null;
+    List<History> tempList = List<History>();
     for (var item in listData) {
       History schedule = History.fromJson(item);
-      map.putIfAbsent(schedule.date, () => schedule);
+      tempList.add(schedule);
     }
-    return HistoryResponse(listOfHistory: map);
+    return HistoryResponse(listOfHistory: tempList);
   }
 }

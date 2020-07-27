@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:eaw/blocs/HistoryBloc.dart';
 import 'package:eaw/blocs/HomeBloc.dart';
 import 'package:eaw/dto/HomeResponse.dart';
 import 'package:eaw/dto/LastAttendance.dart';
@@ -28,6 +29,8 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController _editingController = TextEditingController();
   BuildContext context;
   DateTime dateTime = DateTime.now();
   DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
@@ -196,7 +199,6 @@ class HomePageState extends State<HomePage> {
                     setMapValue();
                   }
                 }
-
                 return Scaffold(
                     appBar: getAppbar("Trang chủ"),
                     body: getBody(),
@@ -247,52 +249,382 @@ class HomePageState extends State<HomePage> {
             width: common.getWidthContext(context) / 3.5,
             child: Center(
                 child: Text("Hôm nay",
-                    style: TextStyle(fontSize: 20, color: Colors.white))),
+                    style: TextStyle(fontSize: 24, color: Colors.white))),
           ),
           Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: Text("${dateFormat.format(dateTime)}",
-                  style: TextStyle(fontSize: 20, color: Colors.white)),
-            ),
+            child: buildRequestButton(),
           ),
           Expanded(
-            flex: 1,
-            child: buildScanCameraButton(),
+            child: buildScanQRButton(),
           )
         ],
       ),
     );
   }
 
-  buildScanCameraButton() {
+  buildScanQRButton() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.grey[400], borderRadius: BorderRadius.circular(8)),
+        child: OutlineButton(
+            onPressed: () async {
+              try {
+                common.checkNetWork(context);
+                initConnectivity();
+                String codeSanner = await BarcodeScanner.scan();
+                Map<String, dynamic> map = jsonDecode(codeSanner);
+                RequestQr requestQr = RequestQr(
+                    faceMachineCode: map['faceMachineCode'],
+                    createTime: map['createTime'],
+                    empCode: homeResponse.empCode,
+                    wifiName: wifiName);
+                bool result = await homeBloc.sendRequestAttendanceByQr(
+                    requestQr, common.userToken);
+                showDialog(
+                  context: context,
+                  builder: (context) =>
+                      Dialog(child: buildSuccessDialog(result)),
+                );
+              } catch (e) {
+                print(e);
+              }
+            },
+            child: Row(
+              children: <Widget>[
+                Icon(
+                  Icons.camera_enhance,
+                  color: Colors.pink,
+                  size: 24.0,
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Expanded(
+                  child: Text("Quét QR"),
+                )
+              ],
+            )),
+      ),
+    );
+  }
+
+  buildRequestButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
       child: Container(
         decoration: BoxDecoration(
             color: Colors.grey[400], borderRadius: BorderRadius.circular(8)),
         child: OutlineButton(
           onPressed: () async {
-            initConnectivity();
-            String codeSanner = await BarcodeScanner.scan();
-            Map<String, dynamic> map = jsonDecode(codeSanner);
-            RequestQr requestQr = RequestQr(
-                faceMachineCode: map['faceMachineCode'],
-                createTime: map['createTime'],
-                empCode: homeResponse.empCode,
-                wifiName: wifiName);
-            bool result = await homeBloc.sendRequestAttendanceByQr(
-                requestQr, common.userToken);
-            showDialog(
-              context: context,
-              builder: (context) => Dialog(child: buildSuccessDialog(result)),
-            );
+            await common.checkNetWork(context);
+            await initConnectivity();
+            DateTime now = DateTime.now();
+            getDialog(now, this.wifiName);
           },
-          child: Text("Scan QR"),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                flex: 1,
+                child: Container(
+                  child: Icon(
+                    Icons.add_box,
+                    color: Colors.pink,
+                    size: 24.0,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Expanded(
+                flex: 3,
+                child: Text("Điểm danh"),
+              )
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  getDialog(DateTime createTime, String wifiName) {
+    showDialog(
+      context: this.context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0)), //this right here
+        child: Container(
+          height: 400,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12.0, 0, 12, 0),
+            child: Container(
+              height: 350,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                      height: 330,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            flex: 2,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 8.0, bottom: 8),
+                              child: Container(
+                                  width: 120,
+                                  decoration: BoxDecoration(
+                                      border: Border(
+                                    bottom: BorderSide(
+                                      color: Colors.black,
+                                      width: 1.0,
+                                    ),
+                                  )),
+                                  child: Center(
+                                    child: Text(
+                                      "Yêu cầu",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 5,
+                            child: Column(
+                              children: <Widget>[
+                                Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child:
+                                            buildContainer("Cửa hàng", "EL111"),
+                                        flex: 1,
+                                      ),
+                                      Expanded(
+                                        child: buildContainer("Ngày",
+                                            "${dateFormat.format(createTime)}"),
+                                        flex: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: buildContainer("Giờ vào",
+                                            "${createTime.hour}:${createTime.minute}"),
+                                        flex: 1,
+                                      ),
+                                      Expanded(
+                                        child: buildContainer(
+                                            "Tên Wifi", wifiName),
+                                        flex: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            flex: 5,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                buildContent(),
+                              ],
+                            ),
+                          )
+                        ],
+                      )),
+                  Container(
+                      child: getButtonRequest(
+                          wifiName, createTime.toIso8601String()))
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  buildContent() {
+    return Container(
+        child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Text(
+            "Nội dung",
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+          ),
+        ),
+        SizedBox(
+          height: 5,
+        ),
+        Form(
+          key: _formKey,
+          child: Container(
+              height: common.getHeightContext(context) / 10,
+              width: common.getWidthContext(context) / 1.6,
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    border: Border.all(width: 1, color: Colors.black)),
+                child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 7, 0, 0),
+                    child: TextFormField(
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                          border: InputBorder.none, hintText: "Nội dung?"),
+                      validator: (value) {
+                        if (value.isEmpty || value == null) {
+                          return "Nội dung không thể để trống";
+                        }
+                        if (value.length > 200) return "Nội dung quá dài";
+                        return null;
+                      },
+                    )),
+              )),
+        ),
+      ],
+    ));
+  }
+
+  getButtonRequest(String wifiname, String createTime) {
+    return Container(
+      width: common.getWidthContext(context),
+      height: common.getHeightContext(context) / 20,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10),
+              child: RaisedButton(
+                onPressed: () {
+                  common.checkNetWork(context);
+                  if (_formKey.currentState.validate()) {
+                    sendRequest(wifiname, createTime);
+                    Navigator.of(context).pop();
+                    showSuccessMessage();
+                  }
+                },
+                child: Text(
+                  "Gửi yêu cầu",
+                  style: TextStyle(color: Colors.white),
+                ),
+                color: const Color(0xFF1BC0C5),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10),
+              child: RaisedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  "Hủy bỏ",
+                  style: TextStyle(color: Colors.white),
+                ),
+                color: const Color(0xFF1BC0C5),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  sendRequest(String wifiName, String createTime) async {
+    return await historyBloc.sendRequest(common.userToken, common.userId,
+        createTime, _editingController.text, wifiName);
+  }
+
+  Future showSuccessMessage() {
+    return showDialog(
+        context: context,
+        builder: (context) => Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)), //this right here
+              child: Container(
+                height: common.getHeightContext(context) / 5,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "Gửi yêu cầu thành công",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: OutlineButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Close"),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ));
+  }
+
+  buildContainer(String title, String value) {
+    return Container(
+        child: Row(
+      children: <Widget>[
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              "$title",
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Container(
+              width: common.getWidthContext(context) / 3,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  border: Border.all(width: 1, color: Colors.black)),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 2, 0, 0),
+                child: Text("$value",
+                    style:
+                        TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ));
   }
 
   buildSuccessDialog(bool result) {
@@ -432,96 +764,178 @@ class HomePageState extends State<HomePage> {
         lastAttendance = object as LastAttendance;
         break;
     }
-    return homeResponse != null
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                flex: 1,
-                child: Container(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                            child: getTextBold(
-                                "Ngày: ",
-                                nextWorkShift != null
-                                    ? nextWorkShift.workDate
-                                    : lastAttendance.workDate,
-                                14)),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                            child: getTextBold(
-                                "Cửa hàng: ",
-                                nextWorkShift != null
-                                    ? nextWorkShift.storeName
-                                    : lastAttendance.storeName,
-                                14)),
-                      )
-                    ],
+    if (nextWorkShift != null)
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: Container(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                        child: getTextBold(
+                            "Ngày: ",
+                            nextWorkShift.workDate != null
+                                ? nextWorkShift.workDate
+                                : "Cập nhật",
+                            14)),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                        child: getTextBold(
+                            "Cửa hàng: ",
+                            nextWorkShift.storeName != null
+                                ? nextWorkShift.storeName
+                                : "Cập nhật",
+                            14)),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  child: getTextBold(
+                      "Từ: ",
+                      nextWorkShift.startDate != null
+                          ? nextWorkShift.startDate
+                          : "Cập nhật",
+                      14),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Container(
+                      child: getTextBold(
+                          "Đến: ",
+                          nextWorkShift.endDate != null
+                              ? nextWorkShift.endDate
+                              : "Cập nhật",
+                          14),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    child: getTextBold(
+                        "Địa chỉ: ",
+                        nextWorkShift.address != null
+                            ? nextWorkShift.address
+                            : "Cập nhật",
+                        14),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        child: getTextBold(
-                            "Từ: ",
-                            nextWorkShift != null
-                                ? nextWorkShift.startDate
-                                : lastAttendance.startDate,
-                            14),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Container(
-                          child: getTextBold(
-                              "Đến: ",
-                              nextWorkShift != null
-                                  ? nextWorkShift.endDate
-                                  : lastAttendance.endDate,
-                              14),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        child: getTextBold(
-                            "Địa chỉ: ",
-                            nextWorkShift != null
-                                ? nextWorkShift.address
-                                : lastAttendance.address,
-                            14),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
+              ],
+            ),
           )
-        : loadingData();
+        ],
+      );
+    else
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: Container(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                        child: getTextBold(
+                            "Ngày: ",
+                            lastAttendance.date != null
+                                ? lastAttendance.date.split("\n")[1]
+                                : "Cập nhật",
+                            14)),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                        child: getTextBold(
+                            "Cửa hàng: ",
+                            lastAttendance.storeName != null
+                                ? lastAttendance.storeName
+                                : "Cập nhật",
+                            14)),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  child: getTextBold(
+                      "Thời gian: ",
+                      lastAttendance.time != null
+                          ? lastAttendance.time
+                          : "Cập nhật",
+                      14),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Container(
+                      child: getTextBold(
+                          "Loại: ",
+                          lastAttendance.mode != null
+                              ? lastAttendance.mode
+                              : "Cập nhật",
+                          14),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    child: getTextBold(
+                        "Trạng thái: ",
+                        lastAttendance.status != null
+                            ? lastAttendance.status
+                            : "Cập nhật",
+                        14),
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      );
   }
 
   getTextBold(String title, String value, double size) {

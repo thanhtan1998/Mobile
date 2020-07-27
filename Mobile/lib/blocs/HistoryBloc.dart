@@ -15,10 +15,10 @@ class HistoryBloc {
     data.sink.add(historyResponse);
   }
 
-  sendRequest(
-      String userToken, int userId, int workShiftId, String content) async {
+  sendRequest(String userToken, int userId, String createTime, String content,
+      String wifiName) async {
     return await historyRepo.sendRequest(
-        userToken, userId, workShiftId, content);
+        userToken, userId, createTime, content, wifiName);
   }
 }
 

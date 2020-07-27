@@ -1,5 +1,12 @@
 class Schedule {
-  String date, startDate, endDate, brandName, storeName, address;
+  String date,
+      startDate,
+      endDate,
+      brandName,
+      storeName,
+      address,
+      checkinExpandTime,
+      checkoutExpandTime;
   bool status;
   Schedule(
       {this.startDate,
@@ -8,16 +15,24 @@ class Schedule {
       this.storeName,
       this.status,
       this.address,
-      this.date});
+      this.date,
+      this.checkinExpandTime,
+      this.checkoutExpandTime});
 
   factory Schedule.fromJson(Map<String, dynamic> json) {
     return Schedule(
-        startDate: json['checkin'] != null ? json['checkin'] : null,
-        date: json['date'] != null ? json['date'] : null,
-        endDate: json['checkout'] != null ? json['checkout'] : null,
-        status: json['status'] != null ? json['status'] : null,
-        storeName: json['storeName'] != null ? json['storeName'] : null,
-        brandName: json['brandName'] != null ? json['brandName'] : null,
-        address: json['AddressStore'] != null ? json['AddressStore'] : null);
+      startDate: json['checkin'] != null ? json['checkin'] : null,
+      date: json['date'] != null ? json['date'] : null,
+      endDate: json['checkout'] != null ? json['checkout'] : null,
+      status: json['status'] != null ? json['status'] : null,
+      storeName: json['storeName'] != null ? json['storeName'] : null,
+      brandName: json['brandName'] != null ? json['brandName'] : null,
+      address: json['AddressStore'] != null ? json['AddressStore'] : null,
+      checkinExpandTime:
+          json['checkinExpandTime'] != null ? json['checkinExpandTime'] : null,
+      checkoutExpandTime: json['checkoutExpandTime'] != null
+          ? json['checkoutExpandTime']
+          : null,
+    );
   }
 }

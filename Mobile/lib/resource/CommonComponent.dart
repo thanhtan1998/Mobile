@@ -6,7 +6,6 @@ import 'package:eaw/resource/SharedPreferences.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CommonComponent {
   int currentIndex = 0;
@@ -93,7 +92,6 @@ class CommonComponent {
                         image: getImage() != null
                             ? getImage()
                             : AssetImage("assets/unknow.png"))),
-//                        image: new NetworkImage("@{common.firebaseUser.photoUrl}"))),
               ),
             ),
           ),
@@ -128,9 +126,8 @@ class CommonComponent {
   }
 
   Future<bool> firstTimeBuild() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     currentIndex = 0;
-    if (prefs.containsKey(ShareRef.tokenKey)) {
+    if (userToken != null) {
       return true;
     } else {
       return false;
@@ -143,19 +140,19 @@ class CommonComponent {
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
-          title: Text('Home', style: bootomText),
+          title: Text('Trang chủ', style: bootomText),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.calendar_today),
-          title: Text('Schema', style: bootomText),
+          title: Text('Ca làm', style: bootomText),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.history),
-          title: Text('History', style: bootomText),
+          title: Text('Diểm danh', style: bootomText),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),
-          title: Text('Setting', style: bootomText),
+          title: Text('Cài đặt', style: bootomText),
         ),
       ],
       currentIndex: common.currentIndex,

@@ -1,26 +1,19 @@
 class History {
-  String date, checkin, storeName, address, brandName, imageCheckFace;
-  int workshiftId;
-  bool status;
+  String date, time, storeName, mode, status, imageCheckFace;
   History(
-      {this.address,
-      this.brandName,
-      this.checkin,
-      this.date,
+      {this.date,
       this.imageCheckFace,
       this.status,
       this.storeName,
-      this.workshiftId});
+      this.mode,
+      this.time});
   factory History.fromJson(Map<String, dynamic> json) {
     return History(
-        checkin: json['checkin'] != null ? json['checkin'] : null,
-        workshiftId: json['workshiftId'] != null ? json['workshiftId'] : null,
         date: json['date'] != null ? json['date'] : null,
-        imageCheckFace:
-            json['imageCheckFace'] != null ? json['imageCheckFace'] : null,
+        time: json['time'] != null ? json['time'] : null,
+        mode: json['mode'] != null ? json['mode'] : null,
+        imageCheckFace: json['image'] != null ? json['image'] : null,
         status: json['status'] != null ? json['status'] : null,
-        storeName: json['storeName'] != null ? json['storeName'] : null,
-        brandName: json['brandName'] != null ? json['brandName'] : null,
-        address: json['AddressStore'] != null ? json['AddressStore'] : null);
+        storeName: json['Store'] != null ? json['Store'] : null);
   }
 }

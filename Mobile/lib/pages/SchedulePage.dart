@@ -289,15 +289,32 @@ class _SchedulePageState extends State<SchedulePage> {
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 1,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Expanded(
-                  flex: 1,
-                  child: Container(
-                      child: getTextBold("Địa chỉ: ", schedule.address, 14)),
-                ),
+                    flex: 2,
+                    child: Container(
+                        child: getTextBold(
+                            "Vào: ",
+                            schedule.checkinExpandTime != null
+                                ? schedule.checkinExpandTime
+                                : "Trống",
+                            14))),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Container(
+                        child: getTextBold(
+                            "Ra: ",
+                            schedule.checkoutExpandTime != null
+                                ? schedule.checkoutExpandTime
+                                : "Trống",
+                            14)),
+                  ),
+                )
               ],
             ),
           )
@@ -427,14 +444,14 @@ class _SchedulePageState extends State<SchedulePage> {
                 ),
               )),
           Container(
-            width: common.getWidthContext(context) / 3.5,
+            width: common.getWidthContext(context) / 3,
             child: OutlineButton(
                 color: Colors.black,
                 splashColor: Colors.grey,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(40)),
                 borderSide: BorderSide(color: Colors.white),
-                child: Text("Pick Date",
+                child: Text("Chọn ngày",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,

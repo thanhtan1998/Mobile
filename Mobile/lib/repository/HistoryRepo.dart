@@ -8,8 +8,9 @@ class HistoryRepo {
     return await provider.getHistory(userToken, userId, startDate, endDate);
   }
 
-  Future sendRequest(
-      String userToken, int userId, int workShiftId, String content) async {
-    return await provider.sendRequest(userToken, userId, workShiftId, content);
+  Future sendRequest(String userToken, int userId, String createTime,
+      String content, String wifiName) async {
+    return await provider.sendRequest(
+        userToken, userId, createTime, content, wifiName);
   }
 }
