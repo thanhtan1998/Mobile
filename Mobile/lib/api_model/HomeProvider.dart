@@ -38,7 +38,7 @@ class HomeProvider {
       'Authorization': 'Bearer $userToken',
     };
     String json =
-        '{"empCode": "${requestQr.empCode}","faceMachineCode": "${requestQr.faceMachineCode}","mode": "${requestQr.mode}","createTime": "${requestQr.createTime}","wifiName": "${requestQr.wifiName}"}';
+        '{"empCode": "${requestQr.empCode}","faceMachineCode": "${requestQr.faceMachineCode}","mode": "${requestQr.mode}","createTime": "${requestQr.createTime.substring(0, requestQr.createTime.length - 6)}","wifiName": "${requestQr.wifiName}"}';
     http.Response response;
     try {
       response = await http.post(url, headers: headers, body: json);

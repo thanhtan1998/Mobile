@@ -38,7 +38,6 @@ class HomePageState extends State<HomePage> {
   int dayNr;
   DateTime thisMonday, thisSunday;
   String stringScanner, wifiName;
-  ConnectivityResult connectivityResult;
   final Connectivity _connectivity = Connectivity();
   Map<String, Object> listContent = {
     "Ca kế tiếp": null,
@@ -273,6 +272,9 @@ class HomePageState extends State<HomePage> {
               try {
                 common.checkNetWork(context);
                 initConnectivity();
+                if (this.wifiName.contains("Error")) {
+                  return;
+                }
                 String codeSanner = await BarcodeScanner.scan();
                 Map<String, dynamic> map = jsonDecode(codeSanner);
                 RequestQr requestQr = RequestQr(
@@ -320,6 +322,9 @@ class HomePageState extends State<HomePage> {
           onPressed: () async {
             await common.checkNetWork(context);
             await initConnectivity();
+            if (this.wifiName.contains("Error")) {
+              return;
+            }
             DateTime now = DateTime.now();
             getDialog(now, this.wifiName);
           },
@@ -519,8 +524,12 @@ class HomePageState extends State<HomePage> {
             child: Padding(
               padding: const EdgeInsets.only(left: 10.0, right: 10),
               child: RaisedButton(
-                onPressed: () {
-                  common.checkNetWork(context);
+                onPressed: () async {
+                  await common.checkNetWork(context);
+                  await initConnectivity();
+                  if (this.wifiName.contains("Error")) {
+                    return;
+                  }
                   if (_formKey.currentState.validate()) {
                     sendRequest(wifiname, createTime);
                     Navigator.of(context).pop();
@@ -609,16 +618,20 @@ class HomePageState extends State<HomePage> {
             SizedBox(
               height: 5,
             ),
-            Container(
-              width: common.getWidthContext(context) / 3,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                  border: Border.all(width: 1, color: Colors.black)),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 2, 0, 0),
-                child: Text("$value",
-                    style:
-                        TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Container(
+                  width: common.getWidthContext(context) / 3,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      border: Border.all(width: 1, color: Colors.black)),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 2, 0, 0),
+                    child: Text("$value",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold)),
+                  ),
+                ),
               ),
             ),
           ],

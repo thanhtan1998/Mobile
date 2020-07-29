@@ -6,6 +6,7 @@ import 'package:eaw/resource/SharedPreferences.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CommonComponent {
   int currentIndex = 0;
@@ -126,8 +127,9 @@ class CommonComponent {
   }
 
   Future<bool> firstTimeBuild() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     currentIndex = 0;
-    if (userToken != null) {
+    if (prefs.containsKey(ShareRef.tokenKey)) {
       return true;
     } else {
       return false;
@@ -179,6 +181,7 @@ class CommonComponent {
     Pages.getHistoryPage,
     Pages.getInformationPage
   ];
+
   checkNetWork(BuildContext context) async {
     var result = await Connectivity().checkConnectivity();
     if (result == ConnectivityResult.none) {

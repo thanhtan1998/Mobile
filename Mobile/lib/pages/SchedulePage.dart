@@ -299,7 +299,8 @@ class _SchedulePageState extends State<SchedulePage> {
                         child: getTextBold(
                             "Vào: ",
                             schedule.checkinExpandTime != null
-                                ? schedule.checkinExpandTime
+                                ? schedule.checkinExpandTime.substring(
+                                    0, schedule.checkinExpandTime.length - 3)
                                 : "Trống",
                             14))),
                 Expanded(
@@ -310,7 +311,8 @@ class _SchedulePageState extends State<SchedulePage> {
                         child: getTextBold(
                             "Ra: ",
                             schedule.checkoutExpandTime != null
-                                ? schedule.checkoutExpandTime
+                                ? schedule.checkoutExpandTime.substring(
+                                    0, schedule.checkoutExpandTime.length - 3)
                                 : "Trống",
                             14)),
                   ),

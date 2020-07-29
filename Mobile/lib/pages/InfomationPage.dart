@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:connectivity/connectivity.dart';
 import 'package:eaw/blocs/InformationBloc.dart';
 import 'package:eaw/dto/InformationResponse.dart';
 import 'package:eaw/pages/EditPage.dart';
@@ -6,9 +9,11 @@ import 'package:eaw/resource/SharedPreferences.dart';
 import 'package:eaw/resource/urlEnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // ignore: must_be_immutable
 class InformationPage extends StatefulWidget {
@@ -38,6 +43,8 @@ class _InformationPageState extends State<InformationPage> {
   Map<String, String> listOfContent;
   BuildContext context;
   InformationResponse informationResponse;
+  String wifiName;
+  final Connectivity _connectivity = Connectivity();
   @override
   void initState() {
     common.checkNetWork(context);
@@ -70,6 +77,48 @@ class _InformationPageState extends State<InformationPage> {
                         common.getNavigationBar(context, null));
               });
         });
+  }
+
+  Future<void> initConnectivity() async {
+    ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      print(e.toString());
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+    if (Platform.isAndroid) {
+      var status = await Permission.location.status;
+      if (status.isUndetermined || status.isDenied || status.isRestricted) {
+        if (await Permission.location.request().isGranted) {
+          print('Location permission granted');
+        } else {
+          print('Location permission not granted');
+        }
+      } else {
+        print('Permission already granted (previous execution?)');
+      }
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    switch (result) {
+      case ConnectivityResult.wifi:
+        wifiName = "Wifi";
+        break;
+      case ConnectivityResult.mobile:
+        wifiName = "Mobile Network";
+        break;
+      case ConnectivityResult.none:
+        wifiName = "Network Error";
+        break;
+    }
   }
 
   Future<void> showDate() async {
@@ -217,14 +266,19 @@ class _InformationPageState extends State<InformationPage> {
       return Expanded(
           flex: 1,
           child: IconButton(
-            icon: e,
-            onPressed: () => title.trim().compareTo("Sinh nhật") != 0
-                ? showDialog(
-                    context: context,
-                    builder: (context) => EditPage(title, oldValue),
-                  )
-                : showDate(),
-          ));
+              icon: e,
+              onPressed: () async {
+                await common.checkNetWork(context);
+                initConnectivity();
+                if (!this.wifiName.contains("Error")) {
+                  title.trim().compareTo("Sinh nhật") != 0
+                      ? showDialog(
+                          context: context,
+                          builder: (context) => EditPage(title, oldValue),
+                        )
+                      : showDate();
+                }
+              }));
     }
 
     return Expanded(

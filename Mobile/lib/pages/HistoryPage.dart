@@ -295,12 +295,14 @@ class _HistoryPageState extends State<HistoryPage> {
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: <Widget>[
                                           getTextBold2(
                                               " ${listHistory.elementAt(index).date.split("\n")[1]}\n",
                                               "${listHistory.elementAt(index).time}",
-                                              20,
-                                              24)
+                                              18,
+                                              22),
                                         ],
                                       ),
                                     )),
